@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificador de Quadras de Pickleball</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <!-- Barra de utilizador -->
+    <div class="user-bar">
+    <div class="user-info">
+        <span id="user-display" onclick="showUserSettingsModal()">Visitante</span>
+        <span id="user-points" class="points">0 pts</span>
+    </div>
+
+    <!-- NOVO: Campo de Busca de Jogador por ID na User Bar (HTML CORRIGIDO) -->
+    <div class="user-bar-search-group"> <!-- Use esta classe para estilizar -->
+        <input type="text" id="player-search-id" placeholder="Buscar ID do jogador">
+        <button onclick="searchPlayerById()">Buscar</button>
+    </div>
+
+    <div class="user-actions">
+        <button id="login-btn" onclick="showLoginModal()">Login</button>
+        <button id="register-btn" onclick="showRegisterModal()">Cadastre-se</button>
+        <button id="logout-btn" onclick="logout()" style="display: none;">Logout</button>
+        <button id="ranking-btn" onclick="showRankingModal()">🏆 Ranking</button>
+        <button id="admin-panel-btn" onclick="showAdminPanelModal()" style="display: none;">⚙️ Admin</button>
+    </div>
+</div>
+
+<!-- Onde os resultados da busca serão exibidos (pode ser um modal ou um elemento flutuante) -->
+<!-- Para simplicidade, vamos usar um modal para os resultados, já que a barra é pequena -->
+<div id="player-search-results-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="hidePlayerSearchResultsModal()">&times;</span>
+        <h2>Resultados da Busca</h2>
+        <div id="player-search-results-content">
+            <!-- O card do jogador será inserido aqui -->
+        </div>
+    </div>
+</div>
+
+    <div class="container">
+        <h1>🏓 Notificador de Quadras de Pickleball</h1>
+        <div class="court-status">
+            <div class="court-card">
+                <h2>Quadra CERET</h2>
+                <!-- NOVO: Elemento para o aviso de aula na quadra CERET -->
+                <div id="announcement-ceret" class="court-announcement left"></div>
+                <p id="status-ceret" class="free">
+                    <span class="status-indicator free"></span>
+                    Livre
+                </p>
+                <button id="btn-ceret" onclick="toggleCourtStatus('ceret')">Ocupar Quadra</button>
+                <div id="timer-ceret" class="timer" style="display: none;"></div>
+                <div id="players-ceret" class="players-list"></div>
+            </div>
+            <div class="court-card">
+                <h2>Quadra Pelezão</h2>
+                <!-- NOVO: Elemento para o aviso de aula na quadra Pelezão -->
+                <div id="announcement-pelezao" class="court-announcement right"></div>
+                <p id="status-pelezao" class="free">
+                    <span class="status-indicator free"></span>
+                    Livre
+                </p>
+                <button id="btn-pelezao" onclick="toggleCourtStatus('pelezao')">Ocupar Quadra</button>
+                <div id="timer-pelezao" class="timer" style="display: none;"></div>
+                <div id="players-pelezao" class="players-list"></div>
+            </div>
+        </div>
+
+        <!-- Seção de Eventos -->
+        <div class="events-section">
+            <h2>📅 Eventos e Novidades</h2>
+            <div id="events-container" class="events-container">
+                <!-- Eventos serão carregados dinamicamente aqui -->
+                <div class="no-events-message">
+                    <p>Nenhum evento programado no momento.</p>
+                    <p>Fique atento às novidades!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- Modal de Login -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideLoginModal()">&times;</span>
+            <h2>🏓 Login</h2>
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="login-email">Email:</label>
+                    <input type="email" id="login-email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Senha:</label>
+                    <input type="password" id="login-password" name="password" required>
+                </div>
+                <!-- NOVO: Link "Esqueci a senha?" -->
+                <p class="login-note" style="text-align: right; margin-top: -10px; margin-bottom: 15px;">
+                    <a href="#" onclick="showForgotPasswordModal()">Esqueci a senha?</a>
+                </p>
+                <button type="submit">Entrar</button>
+            </form>
+            <p class="login-note">Primeira vez? <a href="#" onclick="switchToRegister()">Cadastre-se aqui!</a></p>
+        </div>
+    </div>
+
+        <!-- NOVO: Modal de Esqueci a Senha -->
+    <div id="forgot-password-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideForgotPasswordModal()">&times;</span>
+            <h2>🔒 Redefinir Senha</h2>
+            <form id="forgot-password-form" onsubmit="handleForgotPassword(event)">
+                <p style="margin-bottom: 20px; text-align: center; color: #555;">
+                    Informe o seu email cadastrado para receber um link de redefinição de senha.
+                </p>
+                <div class="form-group">
+                    <label for="forgot-password-email">Email:</label>
+                    <input type="email" id="forgot-password-email" name="email" required>
+                </div>
+                <button type="submit">Enviar Link de Redefinição</button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Modal de Cadastro -->
+    <div id="register-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideRegisterModal()">&times;</span>
+            <h2>📝 Cadastre-se</h2>
+            <form id="register-form" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="register-username">Nome:</label>
+                    <input type="text" id="register-username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-lastname">Sobrenome:</label>
+                    <input type="text" id="register-lastname" name="lastname" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email:</label>
+                    <input type="email" id="register-email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Senha:</label>
+                    <input type="password" id="register-password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm-password">Confirmar Senha:</label>
+                    <input type="password" id="register-confirm-password" name="confirm-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-phone">Telefone (opcional):</label>
+                    <input type="tel" id="register-phone" name="phone">
+                </div>
+                <button type="submit">Criar Conta</button>
+            </form>
+            <p class="login-note">Já tem uma conta? <a href="#" onclick="switchToLogin()">Faça login aqui!</a></p>
+        </div>
+    </div>
+
+    <!-- Modal de Ranking -->
+    <div id="ranking-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideRankingModal()">&times;</span>
+            <h2>🏆 Ranking de Pontos</h2>
+            <div id="ranking-list" class="ranking-list">
+                <!-- Ranking será preenchido dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <div id="user-settings-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="hideUserSettingsModal()">&times;</span>
+        <h2>⚙️ Minhas Configurações</h2>
+        <div class="user-details">
+            <p><strong>Nome Completo:</strong> <span id="settings-full-name"></span></p>
+            <p><strong>Email:</strong> <span id="settings-email"></span></p>
+            <p><strong>Telefone:</strong> <span id="settings-phone"></span></p>
+            <p><strong>Tempo Total na Quadra:</strong> <span id="settings-total-time"></span></p>
+            <p><strong>Membro Desde:</strong> <span id="settings-join-date"></span></p>
+            <!-- NOVO: ID de Configuração -->
+            <p><strong>ID de Configuração:</strong> <span id="settings-config-id"></span></p>
+        </div>
+        <div class="time-history">
+            <h3>Histórico de Tempo na Quadra:</h3>
+            <ul id="history-list">
+                    <!-- Histórico será preenchido dinamicamente -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="player-details-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="hidePlayerDetailsModal()">&times;</span>
+        <h2>Detalhes do Jogador</h2>
+        <div class="player-details-content">
+            <p><strong>Nome:</strong> <span id="player-detail-name"></span></p>
+            <p><strong>Email:</strong> <span id="player-detail-email"></span></p>
+            <p><strong>Telefone:</strong> <span id="player-detail-phone"></span></p>
+            <p><strong>Tempo Total na Quadra:</strong> <span id="player-detail-total-time"></span></p>
+            <p><strong>Membro Desde:</strong> <span id="player-detail-join-date"></span></p>
+            <p><strong>ID de Configuração:</strong> <span id="player-detail-config-id"></span></p>
+            <!-- Adicione outros detalhes que desejar exibir -->
+        </div>
+    </div>
+</div>
+
+    <!-- NOVO: Modal do Painel de Administração -->
+    <div id="admin-panel-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="hideAdminPanelModal()">&times;</span>
+            <h2>⚙️ Painel de Administração</h2>
+            
+            <div class="admin-section">
+                <h3>Anunciar Aulas</h3>
+                <form id="announcement-form" onsubmit="handleAnnouncement(event)">
+                    <div class="form-group">
+                        <label for="announcement-court">Quadra:</label>
+                        <select id="announcement-court" required>
+                            <option value="">Selecione a Quadra</option>
+                            <option value="ceret">CERET</option>
+                            <option value="pelezao">Pelezão</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="announcement-type">Tipo de Anúncio:</label>
+                        <select id="announcement-type" onchange="toggleReasonField()" required>
+                            <option value="class-on">Haverá Aula</option>
+                            <option value="class-off">Não Haverá Aula</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="announcement-reason-group" style="display: none;">
+                        <label for="announcement-reason">Motivo (se não houver aula):</label>
+                        <textarea id="announcement-reason" rows="3" placeholder="Ex: Chuva, Manutenção, Feriado..."></textarea>
+                    </div>
+                    <button type="submit">Publicar Anúncio</button>
+                </form>
+            </div>
+
+            <div class="admin-section">
+                <h3>Gerenciar Eventos</h3>
+                <form id="event-form" onsubmit="handleEventSubmission(event)">
+                    <div class="form-group">
+                        <label for="event-title">Título do Evento:</label>
+                        <input type="text" id="event-title" required placeholder="Ex: Campeonato de Pickleball">
+                    </div>
+                    <div class="form-group">
+                        <label for="event-type">Tipo de Evento:</label>
+                        <select id="event-type" required>
+                            <option value="">Selecione o Tipo</option>
+                            <option value="campeonato">🏆 Campeonato</option>
+                            <option value="novidade">📢 Novidade</option>
+                            <option value="passeio">🚌 Passeio</option>
+                            <option value="aula">📚 Aula Especial</option>
+                            <option value="manutencao">🔧 Manutenção</option>
+                            <option value="outro">📅 Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="event-date">Data do Evento:</label>
+                        <input type="date" id="event-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="event-time">Horário:</label>
+                        <input type="time" id="event-time" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="event-description">Descrição:</label>
+                        <textarea id="event-description" rows="4" required placeholder="Descreva os detalhes do evento..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="event-location">Local (opcional):</label>
+                        <input type="text" id="event-location" placeholder="Ex: Quadra CERET, Sala de reuniões...">
+                    </div>
+                    <button type="submit">Criar Evento</button>
+                </form>
+            </div>
+
+            <div class="admin-section">
+                <h3>Eventos Existentes</h3>
+                <div id="admin-events-list" class="admin-events-list">
+                    <!-- Lista de eventos para administração será carregada aqui -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="chat-widget" class="chat-widget collapsed">
+    <div class="chat-header" onclick="toggleChat()">
+        <h3 id="chat-header-text">💬 Chat</h3>
+        <span id="chat-notification-badge" class="notification-badge"></span>
+    </div>
+    <div class="chat-body">
+        <div id="chat-messages" class="chat-messages">
+            <!-- Mensagens do chat serão carregadas aqui -->
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chat-message-input" placeholder="Digite sua mensagem...">
+            <button id="chat-send-btn">Enviar</button>
+        </div>
+    </div>
+</div>
+
+    
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
