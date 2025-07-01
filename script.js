@@ -277,7 +277,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         listenForChatMessages();
         // ... outras inicializações relacionadas ao chat, se houver
     } else {
-        console.warn("Elemento #chat-widget não encontrado. O chat global não será inicializado.");
+        console.warn("Elemento #chat-widget não encontrado. O Cerezão não será inicializado.");
     }
     
     // NOVO: Verifique se os elementos do chat existem antes de inicializar
@@ -295,15 +295,18 @@ function initializeAuth() {
         if (user) {
             const userProfile = await getUserProfile(user.uid);
 
-            currentUser = {
-                uid: user.uid,
-                username: userProfile?.username || user.email || "Usuário Desconhecido",
-                lastName: userProfile?.lastName || "",
-                email: user.email,
-                phone: userProfile?.phone || "",
-                totalTime: userProfile?.totalTime || 0,
-                joinDate: userProfile?.joinDate || new Date().toISOString()
-            };
+             currentUser = {
+            uid: user.uid,
+            username: userProfile?.username || user.email || "Usuário Desconhecido",
+            lastName: userProfile?.lastName || "",
+            email: user.email,
+            phone: userProfile?.phone || "",
+            totalTime: userProfile?.totalTime || 0,
+            joinDate: userProfile?.joinDate || new Date().toISOString(),
+            configId: userProfile?.configId || null,
+            // ESTA É A LINHA CORRETA DENTRO DO OBJETO currentUser
+            playsAt: userProfile?.playsAt || "" 
+        };
             updateUserDisplay();
 
 
@@ -351,34 +354,48 @@ async function handleLogin(event) {
     }
     
     try {
-        const userCredential = await auth.signInWithEmailAndPassword(email, password);
-        const user = userCredential.user;
-        
-        const userProfile = await getUserProfile(user.uid);
-        // Prioriza o username e lastName do perfil, se existirem. Caso contrário, usa o email.
-        if (userProfile && userProfile.username) {
-            currentUser = { ...userProfile, uid: user.uid };
-            updateUserDisplay(); // Atualiza a exibição imediatamente
-            showNotification(`Bem-vindo de volta, ${currentUser.username} ${currentUser.lastName || ""}!`);
-        } else {
-            // Fallback: Se o perfil ou o username estiver faltando, usa o email como username
-            currentUser = { uid: user.uid, username: user.email || "Usuário Desconhecido", lastName: "", totalTime: userProfile?.totalTime || 0 };
-            updateUserDisplay();
-            showNotification(`Bem-vindo de volta, ${currentUser.username} ${currentUser.lastName || ""}!`);
-        }
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+    
+    const userProfile = await getUserProfile(user.uid);
+    
+    if (userProfile && userProfile.username) {
+        currentUser = { 
+            ...userProfile, 
+            uid: user.uid,
+            // ESTA É A LINHA CORRETA DENTRO DO OBJETO currentUser
+            playsAt: userProfile.playsAt || "" 
+        };
 
-        hideLoginModal();
-        document.getElementById("login-form").reset();
-    } catch (error) {
-        let errorMessage = "Erro ao fazer login. Por favor, tente novamente.";
-        if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
-            errorMessage = "Email ou senha incorretos.";
-        } else if (error.code === "auth/invalid-email") {
-            errorMessage = "Formato de email inválido.";
-        }
-        showNotification(errorMessage);
-        console.error("Erro de login:", error);
+        updateUserDisplay();
+        showNotification(`Bem-vindo de volta, ${currentUser.username} ${currentUser.lastName || ""}!`);
+        // REMOVA A LINHA playsAt: userProfile.playsAt || "" QUE ESTAVA SOLTA AQUI
+    } else {
+        // Fallback: Se o perfil ou o username estiver faltando, usa o email como username
+        currentUser = { 
+            uid: user.uid, 
+            username: user.email || "Usuário Desconhecido", 
+            lastName: "", 
+            totalTime: userProfile?.totalTime || 0,
+            // ESTA É A LINHA CORRETA DENTRO DO OBJETO currentUser
+            playsAt: userProfile?.playsAt || "" 
+        };
+        updateUserDisplay();
+        showNotification(`Bem-vindo de volta, ${currentUser.username} ${currentUser.lastName || ""}!`);
     }
+
+    hideLoginModal();
+    document.getElementById("login-form").reset();
+} catch (error) {
+    let errorMessage = "Erro ao fazer login. Por favor, tente novamente.";
+    if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+        errorMessage = "Email ou senha incorretos.";
+    } else if (error.code === "auth/invalid-email") {
+        errorMessage = "Formato de email inválido.";
+    }
+    showNotification(errorMessage);
+    console.error("Erro de login:", error);
+}
 }
 
 // Logout
@@ -417,15 +434,16 @@ function switchToLogin() {
 async function handleRegister(event) {
     event.preventDefault();
 
-    const username = document.getElementById("register-username").value.trim();
+     const username = document.getElementById("register-username").value.trim();
     const lastName = document.getElementById("register-lastname").value.trim();
     const email = document.getElementById("register-email").value.trim();
     const password = document.getElementById("register-password").value;
     const confirmPassword = document.getElementById("register-confirm-password").value;
     const phone = document.getElementById("register-phone").value.trim();
+    const playsAt = document.getElementById("register-plays-at").value.trim();
 
     // Validações
-    if (!username || !lastName || !email || !password || !confirmPassword) {
+    if (!username || !lastName || !email || !password || !confirmPassword || !phone || !playsAt) {
         showNotification("Por favor, preencha todos os campos obrigatórios!");
         return;
     }
@@ -449,15 +467,15 @@ async function handleRegister(event) {
         const userConfigId = generateRandomId(12); // Gera um ID de 12 caracteres
 
         // 2. Salvar dados adicionais do perfil no Realtime Database
-        const newUserProfile = {
+       const newUserProfile = {
             username: username,
             lastName: lastName,
             email: email,
-            phone: phone || "",
+            phone: phone,
             totalTime: 0,
             joinDate: new Date().toISOString(),
-            // NOVO: Salvar o ID de configuração gerado
-            configId: userConfigId
+            configId: userConfigId,
+            playsAt: playsAt,
         };
         await database.ref("users/" + uid).set(newUserProfile);
 
@@ -544,7 +562,7 @@ async function showUserSettingsModal() { // Tornada async para buscar histórico
     }
 
     // Preencher os detalhes do utilizador no modal
-    document.getElementById("settings-full-name").textContent = `${currentUser.username} ${currentUser.lastName || ""}`; // Nome completo
+    document.getElementById("settings-full-name").textContent = `${currentUser.username} ${currentUser.lastName || ""}`;
     document.getElementById("settings-email").textContent = currentUser.email || "N/A";
     document.getElementById("settings-phone").textContent = currentUser.phone || "N/A";
     document.getElementById("settings-total-time").textContent = formatTime(currentUser.totalTime || 0);
@@ -560,6 +578,8 @@ async function showUserSettingsModal() { // Tornada async para buscar histórico
     const userSessionsRef = database.ref(`userSessions/${currentUser.uid}`);
     const snapshot = await userSessionsRef.once("value");
     const sessionsData = snapshot.val();
+
+    document.getElementById("settings-plays-at").textContent = currentUser.playsAt || "Não informado";
 
     if (sessionsData) {
         const sessionsArray = Object.values(sessionsData);
@@ -740,7 +760,7 @@ function toggleChat() {
     if (chatWidget.classList.contains("collapsed")) {
         chatHeaderText.textContent = "💬 Chat"; // Texto para o ícone
     } else {
-        chatHeaderText.textContent = "💬 Chat Global"; // Texto quando expandido
+        chatHeaderText.textContent = "💬 Cerezão"; // Texto quando expandido
         // Rola para o final das mensagens quando o chat é expandido
         const chatMessages = document.getElementById("chat-messages");
         chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -768,20 +788,19 @@ function sendMessage() {
 }
 
     function listenForChatMessages() {
-    const chatMessagesDiv = document.getElementById("chat-messages");
+    const chatMessagesDiv = document.getElementById("chat-messages"); // <-- chatMessagesDiv É DEFINIDO AQUI
     const chatNotificationBadge = document.getElementById("chat-notification-badge");
-}
+
+    if (!chatMessagesDiv) {
+        console.error("Elemento #chat-messages não encontrado. O Cerezão não pode ser inicializado.");
+        return;
+    }
+
+    // AGORA, ESTE BLOCO ESTÁ DENTRO DA FUNÇÃO listenForChatMessages
     chatRef.on("child_added", async (snapshot) => {
         const message = snapshot.val();
         const messageId = snapshot.key;
         const currentUser = getCurrentUser();
-
-        // NOVO: Lógica para ignorar mensagens diretas no chat global
-        if (message.type === "dm") {
-            // Se for uma DM, não exiba no chat global.
-            // A notificação para DMs recebidas já é tratada na lógica do badge.
-            return;
-        }
 
         // ... (restante do código para exibir mensagens do chat global) ...
         // A partir daqui, o código só será executado para mensagens que NÃO são "dm"
@@ -802,7 +821,7 @@ function sendMessage() {
         //     }
         // }
 
-        const senderSpan = document.createElement("span");
+         const senderSpan = document.createElement("span");
         senderSpan.classList.add("sender");
         
         const messageTime = new Date(message.timestamp);
@@ -823,8 +842,8 @@ function sendMessage() {
         contentSpan.classList.add("content");
         contentSpan.textContent = message.text;
 
-        messageElement.appendChild(senderSpan);
-        messageElement.appendChild(contentSpan);
+        messageElement.appendChild(contentSpan); // Primeiro a mensagem
+        messageElement.appendChild(senderSpan); // Depois o nome
 
         if ((currentUser && message.senderUid === currentUser.uid) || isAdmin()) {
             const deleteButton = document.createElement("button");
@@ -835,18 +854,14 @@ function sendMessage() {
             messageElement.appendChild(deleteButton);
         }
         
-        chatMessagesDiv.appendChild(messageElement);
+        chatMessagesDiv.appendChild(messageElement); // ESTA LINHA AGORA TERÁ ACESSO A chatMessagesDiv
 
         chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
-
-        // A lógica de notificação para DMs deve ser movida para fora deste bloco,
-        // para que funcione mesmo se a DM não for exibida no chat global.
-        // Já está no código que te dei na última interação, então apenas certifique-se de que está lá.
     });
 
-    chatListenerAttached = true;
     console.log("Novo listener de chat vinculado.");
 
+    // AGORA, ESTE BLOCO TAMBÉM ESTÁ DENTRO DA FUNÇÃO listenForChatMessages
     chatRef.on("child_removed", (snapshot) => {
         const messageId = snapshot.key;
         const messageElement = document.querySelector(`.chat-message[data-message-id="${messageId}"]`);
@@ -854,6 +869,7 @@ function sendMessage() {
             messageElement.remove();
         }
     });
+} // <--- A FUNÇÃO listenForChatMessages TERMINA AQUI, AGORA COM OS LISTENERS DENTRO!
 
 // Função para apagar uma mensagem
 async function deleteChatMessage(messageId) {
@@ -1917,10 +1933,6 @@ function showAdminPanelModal() {
     window.location.href = 'admin.html';
 }
 
-// Variáveis para armazenar o destinatário da mensagem direta
-let currentDmRecipientUid = null;
-let currentDmRecipientName = null;
-
 // Função para abrir o modal de mensagem direta
 function openDirectMessageModal(recipientUid, recipientName) {
     const currentUser = firebase.auth().currentUser;
@@ -2051,86 +2063,6 @@ function closePrivateChatModal() {
     document.getElementById('private-chat-messages').innerHTML = '<div class="no-private-messages"><p>Inicie uma conversa!</p></div>';
 }
 
-// NOVO: Função para configurar o listener de mensagens privadas
-async function setupPrivateChatListener(userUid, recipientUid) {
-    const chatId = getPrivateChatId(userUid, recipientUid);
-    const privateChatMessagesDiv = document.getElementById('private-chat-messages');
-    const noMessagesDiv = privateChatMessagesDiv.querySelector('.no-private-messages');
-
-    // Desvincular listener anterior se houver (para evitar duplicação ao trocar de chat)
-    if (currentPrivateChatListener) {
-        currentPrivateChatListener();
-    }
-
-    // Limpar mensagens antigas exibidas
-    privateChatMessagesDiv.innerHTML = '';
-
-    const chatRef = firebase.database().ref(`privateChats/${chatId}/messages`);
-
-    // Listener para novas mensagens
-    const onChildAdded = chatRef.on('child_added', (snapshot) => {
-    const message = snapshot.val();
-    console.log("Mensagem recebida no chat privado:", message); // <--- ADICIONE ESTA LINHA PARA DEPURAR
-    const currentUser = getCurrentUser();
-    const isSentByMe = message.senderUid === currentUser.uid;
-    // ... restante do código ...
-});
-
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('private-chat-message');
-        messageElement.classList.add(isSentByMe ? 'sent' : 'received');
-
-        const messageTime = new Date(message.timestamp);
-        const formattedTime = messageTime.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-
-        messageElement.innerHTML = `
-            <span class="sender-name">${isSentByMe ? 'Você' : message.senderName}</span>
-            <span class="message-text">${message.text}</span>
-            <span class="message-time">${formattedTime}</span>
-        `;
-        privateChatMessagesDiv.appendChild(messageElement);
-
-        // Rolar para o final
-        privateChatMessagesDiv.scrollTop = privateChatMessagesDiv.scrollHeight;
-
-        // Remover a mensagem "Inicie uma conversa!" se houver mensagens
-        if (noMessagesDiv) {
-            noMessagesDiv.remove();
-        }
-    };
-
-    // Armazenar a função de desvinculação para que possa ser chamada ao fechar o modal
-    currentPrivateChatListener = () => chatRef.off('child_added', onChildAdded);
-
-    // Adicionar listener para o botão de envio e input
-    const sendButton = document.getElementById('private-chat-send-btn');
-    const messageInput = document.getElementById('private-chat-message-input');
-
-    // Remover listeners antigos para evitar duplicação
-    sendButton.onclick = null;
-    messageInput.onkeypress = null;
-
-    const sendPrivateMessage = async () => {
-        const text = messageInput.value.trim();
-        if (text) {
-            const messageData = {
-                senderUid: userUid,
-                senderName: `${currentUser.username} ${currentUser.lastName || ""}`,
-                text: text,
-                timestamp: firebase.database.ServerValue.TIMESTAMP // Usa timestamp do servidor
-            };
-            await chatRef.push(messageData);
-            messageInput.value = ''; // Limpa o input
-        }
-    };
-
-    sendButton.onclick = sendPrivateMessage;
-    messageInput.onkeypress = (e) => {
-        if (e.key === 'Enter') {
-            sendPrivateMessage();
-        }
-    };
-
 
 // NOVO: Função para atualizar o badge de notificação
 function updateChatNotificationBadge() {
@@ -2153,7 +2085,7 @@ function toggleChat() {
     if (chatWidget.classList.contains("collapsed")) {
         chatHeaderText.textContent = "💬 Chat";
     } else {
-        chatHeaderText.textContent = "💬 Chat Global";
+        chatHeaderText.textContent = "💬 Cerezão";
         const chatMessages = document.getElementById("chat-messages");
         chatMessages.scrollTop = chatMessages.scrollHeight;
         
@@ -2267,7 +2199,7 @@ async function searchPlayerById() {
 
 // NOVO: Função para exibir o resultado da pesquisa de jogador
 function displayPlayerSearchResult(uid, profile) {
-    const searchResultsContentDiv = document.getElementById('player-search-results-content'); // NOVO ID
+    const searchResultsContentDiv = document.getElementById('player-search-results-content');
     searchResultsContentDiv.innerHTML = ''; // Limpa resultados anteriores
 
     const resultCard = document.createElement('div');
@@ -2277,8 +2209,7 @@ function displayPlayerSearchResult(uid, profile) {
         <h3>${profile.username} ${profile.lastName || ""}</h3>
         <p><strong>Email:</strong> ${profile.email}</p>
         <p><strong>ID de Configuração:</strong> ${profile.configId}</p>
-        <button onclick="showPlayerDetailsModal('${uid}'); hidePlayerSearchResultsModal();">Ver Detalhes</button>
-        <button onclick="openPrivateChatModal('${uid}', '${profile.username} ${profile.lastName || ""}'); hidePlayerSearchResultsModal();">Enviar Mensagem</button>
+        <button class="btn-view-details" onclick="showPlayerDetailsModal('${uid}'); hidePlayerSearchResultsModal();">Ver Detalhes</button>
     `;
     searchResultsContentDiv.appendChild(resultCard);
 }
@@ -2290,22 +2221,4 @@ function showPlayerSearchResultsModal() {
 
 function hidePlayerSearchResultsModal() {
     document.getElementById("player-search-results-modal").style.display = "none";
-}
-
-// NOVO: Função para exibir o resultado da pesquisa de jogador
-function displayPlayerSearchResult(uid, profile) {
-    const searchResultsDiv = document.getElementById('player-search-results');
-    searchResultsDiv.innerHTML = ''; // Limpa resultados anteriores
-
-    const resultCard = document.createElement('div');
-    resultCard.className = 'player-search-card';
-
-    resultCard.innerHTML = `
-        <h3>${profile.username} ${profile.lastName || ""}</h3>
-        <p><strong>Email:</strong> ${profile.email}</p>
-        <p><strong>ID de Configuração:</strong> ${profile.configId}</p>
-        <button onclick="showPlayerDetailsModal('${uid}')">Ver Detalhes</button>
-        <button onclick="openPrivateChatModal('${uid}', '${profile.username} ${profile.lastName || ""}')">Enviar Mensagem</button>
-    `;
-    searchResultsDiv.appendChild(resultCard);
 }
