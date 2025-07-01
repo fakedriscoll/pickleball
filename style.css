@@ -235,7 +235,7 @@ h1 {
 .user-info {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 8px; /* Diminua este valor de 15px para 8px (ou o que preferir) */
 }
 
 .user-info span {
@@ -243,12 +243,96 @@ h1 {
     color: #2c3e50;
 }
 
+.user-bar-search-group button {
+    /* Estilos básicos para o botão */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Gradiente de cor */
+    color: white; /* Cor do texto */
+    border: none; /* Remove a borda padrão */
+    padding: 8px 16px; /* Padding interno */
+    border-radius: 20px; /* Bordas arredondadas */
+    cursor: pointer; /* Muda o cursor para indicar clicável */
+    font-weight: 600; /* Texto em negrito */
+    transition: all 0.3s ease; /* Transição suave para efeitos de hover */
+    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3); /* Sombra suave */
+    font-size: 0.9rem; /* Tamanho da fonte */
+}
+
+.user-bar-search-group button:hover {
+    transform: translateY(-2px); /* Efeito de levantar ao passar o mouse */
+    box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4); /* Sombra mais intensa no hover */
+}
+
+.user-bar-search-group button:active {
+    transform: translateY(0); /* Retorna à posição original ao clicar */
+    box-shadow: 0 2px 5px rgba(102, 126, 234, 0.2); /* Sombra menor ao clicar */
+}
+
+.user-bar-search-group input[type="text"] {
+    padding: 8px 12px; /* Padding interno */
+    border: 2px solid #e0e0e0; /* Borda suave */
+    border-radius: 20px; /* Bordas arredondadas */
+    font-size: 0.9rem; /* Tamanho da fonte */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transição suave */
+    outline: none; /* Remove o contorno padrão ao focar */
+    width: 180px; /* Largura do input */
+    margin-right: 10px; /* Espaçamento entre o input e o botão */
+}
+
+.user-bar-search-group input[type="text"]:focus {
+    border-color: #667eea; /* Cor da borda ao focar */
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2); /* Sombra ao focar */
+}
+
+.user-bar-search-group {
+    display: flex;
+    align-items: center;
+    /* Adicione um gap se quiser mais espaço entre eles */
+    /* gap: 10px; */
+}
+
+.btn-view-details {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); /* Um gradiente de azul */
+    color: white; /* Cor do texto */
+    border: none; /* Remove a borda padrão */
+    padding: 10px 20px; /* Padding interno */
+    border-radius: 25px; /* Bordas bem arredondadas (formato de pílula) */
+    cursor: pointer; /* Muda o cursor para indicar clicável */
+    font-weight: 600; /* Texto em negrito */
+    font-size: 0.95rem; /* Tamanho da fonte */
+    transition: all 0.3s ease; /* Transição suave para efeitos de hover */
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3); /* Sombra suave */
+    margin-top: 15px; /* Espaçamento superior */
+    display: inline-block; /* Para que o padding e margin funcionem bem */
+    text-align: center; /* Centraliza o texto */
+    min-width: 120px; /* Largura mínima para o botão */
+}
+
+.btn-view-details:hover {
+    transform: translateY(-2px); /* Efeito de levantar ao passar o mouse */
+    box-shadow: 0 6px 16px rgba(52, 152, 219, 0.5); /* Sombra mais intensa no hover */
+}
+
+.btn-view-details:active {
+    transform: translateY(0); /* Retorna à posição original ao clicar */
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2); /* Sombra menor ao clicar */
+}
+
 .points {
-    background: linear-gradient(135deg, #f39c12, #e67e22);
-    color: white;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 0.9rem;
+    display: inline-flex; /* Usa flexbox para alinhar conteúdo */
+    flex-direction: column; /* Coloca minutos e segundos em colunas */
+    align-items: center; /* Centraliza o texto horizontalmente */
+    justify-content: center; /* Centraliza o texto verticalmente */
+    min-width: 60px; /* Largura mínima para o badge */
+    height: auto; /* Altura automática para se ajustar ao conteúdo */
+    line-height: 1.2; /* Espaçamento entre as linhas (minutos e segundos) */
+    box-shadow: 0 4px 10px rgba(243, 156, 18, 0.4); /* Sombra suave */
+    transition: all 0.3s ease; /* Transição suave para hover */
+    text-align: center; /* Garante que o texto esteja centralizado */
+}
+
+.points:hover {
+    transform: translateY(-2px); /* Efeito de levantar ao passar o mouse */
+    box-shadow: 0 6px 15px rgba(243, 156, 18, 0.6); /* Sombra mais intensa no hover */
 }
 
 .user-actions {
@@ -709,7 +793,8 @@ body {
 .chat-message .sender {
     font-weight: bold;
     color: #667eea;
-    margin-right: 5px;
+    font-size: 0.85rem; /* Diminui o tamanho do nome */
+    /* margin-left: 5px; */
 }
 
 .chat-message .sender span.time { /* Nova regra para o horário */
@@ -721,9 +806,12 @@ body {
 
 .chat-message .content {
     color: #333;
-    word-wrap: break-word; /* Quebra palavras longas */
-    flex-grow: 1; /* Permite que o conteúdo ocupe o espaço restante */
+    word-wrap: break-word;
+    flex-grow: 1;
+    font-size: 1.2rem; /* Aumenta o tamanho da mensagem */
+    /* margin-right: 5px; */
 }
+
 
 .chat-input {
     display: flex;
@@ -2163,62 +2251,4 @@ body {
     .private-chat-input {
         padding: 10px 15px;
     }
-}
-
-/* Estilo para o nome do jogador clicável */
-.player-name-clickable {
-    cursor: pointer;
-    color: #007bff; /* Cor de link */
-    text-decoration: underline;
-    font-weight: 600;
-    transition: color 0.2s ease;
-}
-
-.player-name-clickable:hover {
-    color: #0056b3;
-}
-
-/* Estilos para o modal de detalhes do jogador */
-#player-details-modal .modal-content {
-    max-width: 450px; /* Ajuste o tamanho conforme necessário */
-}
-
-.player-details-content {
-    margin-top: 20px;
-    text-align: left;
-    line-height: 1.8;
-    color: #34495e;
-}
-
-.player-details-content p {
-    margin-bottom: 10px;
-    font-size: 1.1rem;
-}
-
-.player-details-content strong {
-    color: #2c3e50;
-    margin-right: 5px;
-}
-
-.player-actions-modal {
-    margin-top: 30px;
-    text-align: center;
-}
-
-.player-actions-modal button {
-    background: linear-gradient(135deg, #28a745 0%, #218838 100%); /* Verde para enviar mensagem */
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-}
-
-.player-actions-modal button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
 }
