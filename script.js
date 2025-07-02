@@ -1053,18 +1053,23 @@ async function showPlayerDetailsModal(playerUid) {
         const playerProfile = await getUserProfile(playerUid);
 
         if (playerProfile) {
-            // ETAPA 1: Preenche os detalhes do jogador (Nome, Email, etc.)
+            // =======================================================
+            // ===== ESTE É O BLOCO DE CÓDIGO QUE ESTAVA FALTANDO =====
+            // =======================================================
             document.getElementById("player-detail-name").textContent = `${playerProfile.username} ${playerProfile.lastName || ""}`;
             document.getElementById("player-detail-email").textContent = playerProfile.email || "N/A";
             document.getElementById("player-detail-phone").textContent = playerProfile.phone || "N/A";
             document.getElementById("player-detail-total-time").textContent = formatTime(playerProfile.totalTime || 0);
-            document.getElementById("player-detail-join-date").textContent = playerProfile.joinDate ? new Date(playerProfile.joinDate).toLocaleDateString("pt-BR") : "N/A";
+            const joinDate = playerProfile.joinDate ? new Date(playerProfile.joinDate).toLocaleDateString("pt-BR") : "N/A";
+            document.getElementById("player-detail-join-date").textContent = joinDate;
             document.getElementById("player-detail-config-id").textContent = playerProfile.configId || "N/A";
+            // =======================================================
+            // =======================================================
 
-            // ETAPA 2: Chama a função para criar e exibir o botão de amizade
+            // Esta parte, que adiciona o botão, já estava correta
             updateAddFriendButton(playerUid);
 
-            // ETAPA 3: Mostra o modal
+            // Mostra o modal
             document.getElementById("player-details-modal").style.display = "flex";
         } else {
             showNotification("Detalhes do jogador não encontrados.");
