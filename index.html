@@ -192,25 +192,59 @@
     <div id="user-settings-modal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="hideUserSettingsModal()">&times;</span>
-        <h2>⚙️ Minhas Configurações</h2>
-        <div class="user-details">
-            <p><strong>Nome Completo:</strong> <span id="settings-full-name"></span></p>
-            <p><strong>Email:</strong> <span id="settings-email"></span></p>
-            <p><strong>Telefone:</strong> <span id="settings-phone"></span></p>
-            <p><strong>Sexo:</strong> <span id="settings-gender"></span></p>
-            <p><strong>Tempo Total na Quadra:</strong> <span id="settings-total-time"></span></p>
-            <p><strong>Membro Desde:</strong> <span id="settings-join-date"></span></p>
-            <p><strong>ID de Configuração:</strong> <span id="settings-config-id"></span></p>
-            <p><strong>Onde Joga:</strong> <span id="settings-plays-at"></span></p>
-        </div>
-        <div class="time-history">
-            <h3>Histórico de Tempo na Quadra:</h3>
-            <ul id="history-list">
-                    <!-- Histórico será preenchido dinamicamente -->
+        <h2>Minhas Configurações</h2>
+        
+        <!-- NOVO: Wrapper para o corpo do modal -->
+        <div class="user-settings-body">
+            
+            <div class="user-details">
+                <!-- NOVO: Grade para os detalhes -->
+                <div class="user-details-grid">
+                    <div class="detail-item">
+                        <strong>Nome Completo</strong>
+                        <span id="settings-full-name"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Email</strong>
+                        <span id="settings-email"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Telefone</strong>
+                        <span id="settings-phone"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Sexo</strong>
+                        <span id="settings-gender"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Tempo Total na Quadra</strong>
+                        <span id="settings-total-time"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Membro Desde</strong>
+                        <span id="settings-join-date"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>ID de Configuração</strong>
+                        <span id="settings-config-id"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Onde Joga</strong>
+                        <span id="settings-plays-at"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="time-history">
+                <h3>Histórico de Tempo na Quadra</h3>
+                <ul id="history-list">
+                    <!-- Histórico será preenchido dinamicamente aqui -->
                 </ul>
             </div>
+            
         </div>
     </div>
+</div>
 
     <div id="player-details-modal" class="modal">
     <div class="modal-content">
