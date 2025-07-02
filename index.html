@@ -280,19 +280,46 @@
     <div class="modal-content">
         <span class="close" onclick="hidePlayerDetailsModal()">&times;</span>
         <h2>Detalhes do Jogador</h2>
-        <div class="player-details-content">
-            <p><strong>Nome:</strong> <span id="player-detail-name"></span></p>
-            <p><strong>Email:</strong> <span id="player-detail-email"></span></p>
-            <p><strong>Telefone:</strong> <span id="player-detail-phone"></span></p>
-            <p><strong>Tempo Total na Quadra:</strong> <span id="player-detail-total-time"></span></p>
-            <p><strong>Membro Desde:</strong> <span id="player-detail-join-date"></span></p>
-            <p><strong>ID de Configuração:</strong> <span id="player-detail-config-id"></span></p>
-            <!-- Adicione outros detalhes que desejar exibir -->
-</div>
 
-<!-- NOVO: Ações do Perfil -->
+        <!-- ======================================================= -->
+        <!-- ===== CORREÇÃO: USE ESTA NOVA ESTRUTURA DE DETALHES ===== -->
+        <!-- ======================================================= -->
+        <div class="user-settings-body">
+            <div class="user-details">
+                <div class="user-details-grid">
+                    <div class="detail-item">
+                        <strong>Nome Completo</strong>
+                        <span id="player-detail-name"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Email</strong>
+                        <span id="player-detail-email"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Telefone</strong>
+                        <span id="player-detail-phone"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Tempo Total na Quadra</strong>
+                        <span id="player-detail-total-time"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Membro Desde</strong>
+                        <span id="player-detail-join-date"></span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>ID de Configuração</strong>
+                        <span id="player-detail-config-id"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ======================================================= -->
+        <!-- ======================================================= -->
+
+        <!-- Ações do Perfil (O botão de amizade aparecerá aqui) -->
         <div id="player-profile-actions" class="player-profile-actions">
-            <!-- O botão de adicionar amigo será inserido aqui pelo JavaScript -->
+            <!-- Botões inseridos pelo JavaScript -->
         </div>
     </div>
 </div> 
