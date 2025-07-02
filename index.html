@@ -6,6 +6,7 @@
     <title>Notificador de Quadras de Pickleball</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="icon" href="LOGO.png" type="image/x-icon">
 </head>
 <body>
     <!-- Barra de utilizador -->
@@ -156,6 +157,16 @@
                 <label for="register-phone">Telefone:</label>
                 <input type="tel" id="register-phone" name="phone" required>
             </div>
+            <!-- NOVO CAMPO: Sexo -->
+            <div class="form-group">
+                <label for="register-gender">Sexo:</label>
+                <select id="register-gender" name="gender" required>
+                    <option value="">Selecione</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Feminino">Feminino</option>
+                    <option value="Outros">Outros</option>
+                </select>
+            </div>
             <!-- NOVO CAMPO: Onde Joga -->
             <div class="form-group">
                 <label for="register-plays-at">Onde Joga (Ex: CERET, Pelezão, Clube X):</label>
@@ -186,6 +197,7 @@
             <p><strong>Nome Completo:</strong> <span id="settings-full-name"></span></p>
             <p><strong>Email:</strong> <span id="settings-email"></span></p>
             <p><strong>Telefone:</strong> <span id="settings-phone"></span></p>
+            <p><strong>Sexo:</strong> <span id="settings-gender"></span></p>
             <p><strong>Tempo Total na Quadra:</strong> <span id="settings-total-time"></span></p>
             <p><strong>Membro Desde:</strong> <span id="settings-join-date"></span></p>
             <p><strong>ID de Configuração:</strong> <span id="settings-config-id"></span></p>
@@ -322,3 +334,5 @@
     <script src="script.js"></script>
 </body>
 </html>
+
+
