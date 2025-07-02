@@ -192,9 +192,17 @@
     <div id="user-settings-modal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="hideUserSettingsModal()">&times;</span>
+
+        <div class="modal-tabs">
+            <button class="tab-link active" onclick="openUserSettingsTab(event, 'Settings')">⚙️ Minhas Configurações</button>
+            <button class="tab-link" onclick="openUserSettingsTab(event, 'Friends')">👥 Meus Amigos</button>
+        </div>
+
         <h2>Minhas Configurações</h2>
         
         <!-- NOVO: Wrapper para o corpo do modal -->
+        <div id="Settings" class="tab-content" style="display: block;">
+
         <div class="user-settings-body">
             
             <div class="user-details">
@@ -240,11 +248,33 @@
                 <ul id="history-list">
                     <!-- Histórico será preenchido dinamicamente aqui -->
                 </ul>
+                </div>
             </div>
+        </div> <!-- FIM DA ABA SETTINGS -->
+
+        <!-- Conteúdo da Aba de Amigos (AGORA NO LUGAR CERTO) -->
+        <div id="Friends" class="tab-content">
+            <div class="friends-panel">
+                <div class="friend-requests">
+                    <h4>Pedidos de Amizade Pendentes</h4>
+                    <div id="friend-requests-list">
+                        <p class="no-requests">Nenhum pedido de amizade pendente.</p>
+                    </div>
+                </div>
+                <div class="friends-list">
+                    <h4>Sua Lista de Amigos</h4>
+                    <div id="friends-list-container">
+                        <p class="no-friends">Você ainda não adicionou nenhum amigo.</p>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- FIM DA ABA FRIENDS -->
+
+    </div> <!-- Fim do modal-content -->
+</div> <!-- Fim do user-settings-modal -->
             
-        </div>
-    </div>
-</div>
+
+
 
     <div id="player-details-modal" class="modal">
     <div class="modal-content">
@@ -258,9 +288,14 @@
             <p><strong>Membro Desde:</strong> <span id="player-detail-join-date"></span></p>
             <p><strong>ID de Configuração:</strong> <span id="player-detail-config-id"></span></p>
             <!-- Adicione outros detalhes que desejar exibir -->
+</div>
+
+<!-- NOVO: Ações do Perfil -->
+        <div id="player-profile-actions" class="player-profile-actions">
+            <!-- O botão de adicionar amigo será inserido aqui pelo JavaScript -->
         </div>
     </div>
-</div>
+</div> 
 
     <!-- NOVO: Modal do Painel de Administração -->
     <div id="admin-panel-modal" class="modal">
