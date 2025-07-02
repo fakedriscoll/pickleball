@@ -2101,154 +2101,52 @@ body {
     100% { transform: scale(0.8); opacity: 0.7; }
 }
 
-.private-chat-content {
-    max-width: 600px; /* Um pouco maior que os outros modais */
-    height: 80vh; /* Altura fixa para o chat */
-    display: flex;
-    flex-direction: column;
-    padding: 0; /* Remover padding padrão para controle total */
-}
-
-.private-chat-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+/* Estilo principal do botão */
+#forgot-password-btn {
+    width: 100%;
     padding: 15px 20px;
-    border-top-left-radius: 18px;
-    border-top-right-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-}
-
-.private-chat-header h2 {
-    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700; /* Texto mais forte */
     color: white;
-    font-size: 1.4rem;
-    flex-grow: 1;
-    text-align: center;
-}
-
-.private-chat-header .close {
-    position: static; /* Resetar posição para alinhar com o flex */
-    font-size: 2rem;
-    color: white;
-    opacity: 0.8;
-    transition: opacity 0.2s;
-}
-
-.private-chat-header .close:hover {
-    opacity: 1;
-}
-
-.private-chat-messages {
-    flex-grow: 1;
-    padding: 20px;
-    overflow-y: auto;
-    background-color: #f9f9f9;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.private-chat-input {
-    display: flex;
-    padding: 15px 20px;
-    border-top: 1px solid #eee;
-    background-color: white;
-    border-bottom-left-radius: 18px;
-    border-bottom-right-radius: 18px;
-}
-
-.private-chat-input input {
-    flex-grow: 1;
-    border: 1px solid #ddd;
-    border-radius: 25px;
-    padding: 10px 15px;
-    font-size: 1rem;
-    margin-right: 10px;
-    outline: none;
-    transition: border-color 0.2s;
-}
-
-.private-chat-input input:focus {
-    border-color: #667eea;
-}
-
-.private-chat-input button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    
+    /* Um gradiente azul que inspira confiança e ação */
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); 
+    
     border: none;
-    border-radius: 25px;
-    padding: 10px 20px;
+    border-radius: 12px; /* Bordas levemente mais arredondadas */
     cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s ease;
+    text-transform: uppercase; /* Deixa o texto em maiúsculas */
+    letter-spacing: 1px; /* Espaçamento entre as letras */
+    
+    /* Sombra para dar profundidade e destacar o botão */
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+    
+    /* Transição suave para todas as propriedades */
+    transition: all 0.3s ease-out;
 }
 
-.private-chat-input button:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
+/* Efeito ao passar o mouse por cima (hover) */
+#forgot-password-btn:hover {
+    /* O botão "levanta" um pouco e a sombra fica mais pronunciada */
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(52, 152, 219, 0.4);
+    
+    /* O gradiente fica um pouco mais vibrante */
+    background: linear-gradient(135deg, #3cb0f2 0%, #2e90c9 100%);
 }
 
-/* Estilos para mensagens individuais no chat privado */
-.private-chat-message {
-    max-width: 80%;
-    padding: 10px 15px;
-    border-radius: 15px;
-    line-height: 1.4;
-    word-wrap: break-word;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+/* Efeito ao clicar no botão (active) */
+#forgot-password-btn:active {
+    /* O botão "afunda" para dar feedback de clique */
+    transform: translateY(0);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
 }
 
-.private-chat-message.sent {
-    background-color: #e0f7fa; /* Azul claro para mensagens enviadas */
-    align-self: flex-end; /* Alinhar à direita */
-    border-bottom-right-radius: 5px; /* Ajuste para "balão" */
+/* Estilo para quando o botão estiver desabilitado (ex: durante o envio) */
+#forgot-password-btn:disabled {
+    background: #bdc3c7; /* Cor cinza */
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
 }
 
-.private-chat-message.received {
-    background-color: #ffffff; /* Branco para mensagens recebidas */
-    align-self: flex-start; /* Alinhar à esquerda */
-    border-bottom-left-radius: 5px; /* Ajuste para "balão" */
-}
-
-.private-chat-message .sender-name {
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 5px;
-    display: block;
-}
-
-.private-chat-message .message-text {
-    color: #555;
-}
-
-.private-chat-message .message-time {
-    font-size: 0.75em;
-    color: #999;
-    text-align: right;
-    margin-top: 5px;
-    display: block;
-}
-
-.no-private-messages {
-    text-align: center;
-    color: #888;
-    margin-top: 20px;
-    font-style: italic;
-}
-
-/* Responsividade para o modal de chat privado */
-@media (max-width: 600px) {
-    .private-chat-content {
-        width: 95%;
-        height: 90vh;
-    }
-    .private-chat-messages {
-        padding: 15px;
-    }
-    .private-chat-input {
-        padding: 10px 15px;
-    }
-}
