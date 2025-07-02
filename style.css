@@ -2290,3 +2290,183 @@ body {
     min-width: 80px; /* Alinha os valores */
     display: inline-block;
 }
+
+/* Abas no Modal de Configurações */
+.modal-tabs {
+    display: flex;
+    background-color: #eef2f7;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    padding: 5px;
+}
+
+.tab-link {
+    flex: 1;
+    padding: 15px 10px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #64748b;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.tab-link:hover {
+    background-color: #dfe6f0;
+    color: #334155;
+}
+
+.tab-link.active {
+    background-color: #ffffff;
+    color: #667eea;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.tab-content {
+    display: none; /* Escondido por padrão */
+    animation: fadeInTab 0.4s ease-out;
+}
+
+@keyframes fadeInTab {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Painel de Amigos */
+.friends-panel {
+    padding: 25px;
+}
+
+.friend-requests, .friends-list {
+    margin-bottom: 30px;
+}
+
+.friend-requests h4, .friends-list h4 {
+    font-size: 1.3rem;
+    color: #334155;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+#friend-requests-list, #friends-list-container {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.friend-item, .request-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background-color: #fff;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.friend-info {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.friend-actions button, .request-actions button {
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    margin-left: 5px;
+}
+
+.btn-accept {
+    background-color: #28a745;
+    color: white;
+}
+.btn-accept:hover { opacity: 0.8; }
+
+.btn-decline, .btn-remove-friend {
+    background-color: #dc3545;
+    color: white;
+}
+.btn-decline:hover, .btn-remove-friend:hover { opacity: 0.8; }
+
+.no-requests, .no-friends {
+    color: #64748b;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Botão de Adicionar Amigo no Perfil */
+.player-profile-actions {
+    padding: 20px 30px;
+    text-align: center;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn-add-friend {
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+}
+
+.btn-add-friend:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+}
+
+.btn-add-friend.pending {
+    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    color: #333;
+    cursor: not-allowed;
+    box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3);
+}
+
+.btn-add-friend.friends {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+    cursor: default;
+    box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+}
+
+.player-search-card {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.player-search-card h3 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.player-search-card p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.player-search-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Espaçamento entre os botões */
+    flex-wrap: wrap; /* Permite que os botões quebrem a linha em telas pequenas */
+}
+
+/* Ajuste no botão de adicionar amigo para caber melhor */
+.player-search-actions .btn-add-friend {
+    padding: 10px 20px; /* Um pouco menor que o original */
+    font-size: 0.9rem;
+}
