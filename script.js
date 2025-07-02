@@ -2234,6 +2234,12 @@ function hidePlayerSearchResultsModal() {
 }
 
 
+// Mostrar notificação
+function showNotification(message) {
+    // ... (código da função de notificação, sem alterações) ...
+}
+
+
 // =================================================================
 // ===== INÍCIO DO CÓDIGO DE GEOLOCALIZAÇÃO ========================
 // =================================================================
@@ -2327,3 +2333,9 @@ function stopWatchingPosition(uid) {
 // =================================================================    
 // ===== FIM DO CÓDIGO DE GEOLOCALIZAÇÃO ===========================
 // =================================================================
+
+
+// Inicializar quando a página carregar
+document.addEventListener("DOMContentLoaded", async function() {
+    // ... (resto do seu código, sem alterações) ...
+});
