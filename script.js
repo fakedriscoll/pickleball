@@ -1033,7 +1033,7 @@ function displayCourtAnnouncement(court, announcementData) {
     }
 }
 
-// NOVO: Função para exibir o modal de detalhes do jogador
+// Função para exibir o modal de detalhes do jogador (VERSÃO CORRETA E COMPLETA)
 async function showPlayerDetailsModal(playerUid) {
     const currentUser = getCurrentUser();
     if (!currentUser) {
@@ -1042,18 +1042,18 @@ async function showPlayerDetailsModal(playerUid) {
         return;
     }
 
-    // Opcional: Se o usuário clicar no próprio nome, pode redirecionar para as configurações dele
     if (currentUser.uid === playerUid) {
         showNotification("Você clicou no seu próprio perfil. Abrindo suas configurações...");
-        hidePlayerDetailsModal(); // Esconde este modal antes de abrir o outro
+        hidePlayerDetailsModal();
         showUserSettingsModal();
         return;
     }
 
     try {
-        const playerProfile = await getUserProfile(playerUid); // Reutiliza a função existente para buscar perfil
+        const playerProfile = await getUserProfile(playerUid);
 
         if (playerProfile) {
+            // ETAPA 1: Preenche os detalhes do jogador (Nome, Email, etc.)
             document.getElementById("player-detail-name").textContent = `${playerProfile.username} ${playerProfile.lastName || ""}`;
             document.getElementById("player-detail-email").textContent = playerProfile.email || "N/A";
             document.getElementById("player-detail-phone").textContent = playerProfile.phone || "N/A";
@@ -1061,8 +1061,10 @@ async function showPlayerDetailsModal(playerUid) {
             document.getElementById("player-detail-join-date").textContent = playerProfile.joinDate ? new Date(playerProfile.joinDate).toLocaleDateString("pt-BR") : "N/A";
             document.getElementById("player-detail-config-id").textContent = playerProfile.configId || "N/A";
 
-            // As linhas que configuravam o botão de mensagem foram removidas daqui
+            // ETAPA 2: Chama a função para criar e exibir o botão de amizade
+            updateAddFriendButton(playerUid);
 
+            // ETAPA 3: Mostra o modal
             document.getElementById("player-details-modal").style.display = "flex";
         } else {
             showNotification("Detalhes do jogador não encontrados.");
