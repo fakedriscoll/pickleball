@@ -571,11 +571,17 @@ async function showUserSettingsModal() { // Tornada async para buscar histórico
     document.getElementById("settings-full-name").textContent = `${currentUser.username} ${currentUser.lastName || ""}`;
     document.getElementById("settings-email").textContent = currentUser.email || "N/A";
     document.getElementById("settings-phone").textContent = currentUser.phone || "N/A";
+    document.getElementById("settings-gender").textContent = currentUser.gender || "Não informado"; // LINHA ADICIONADA
     document.getElementById("settings-total-time").textContent = formatTime(currentUser.totalTime || 0);
-    
+
     // Formatar a data de entrada
     const joinDate = currentUser.joinDate ? new Date(currentUser.joinDate).toLocaleDateString("pt-BR") : "N/A";
     document.getElementById("settings-join-date").textContent = joinDate;
+
+    // NOVO: Preencher o ID de Configuração
+    document.getElementById("settings-config-id").textContent = currentUser.configId || "N/A";
+    document.getElementById("settings-plays-at").textContent = currentUser.playsAt || "Não informado";
+
 
     // Preencher o histórico de tempo
     const historyList = document.getElementById("history-list");
@@ -584,8 +590,6 @@ async function showUserSettingsModal() { // Tornada async para buscar histórico
     const userSessionsRef = database.ref(`userSessions/${currentUser.uid}`);
     const snapshot = await userSessionsRef.once("value");
     const sessionsData = snapshot.val();
-
-    document.getElementById("settings-plays-at").textContent = currentUser.playsAt || "Não informado";
 
     if (sessionsData) {
         const sessionsArray = Object.values(sessionsData);
@@ -1034,7 +1038,7 @@ function displayCourtAnnouncement(court, announcementData) {
 }
 
 // Função para exibir o modal de detalhes do jogador (VERSÃO CORRETA E COMPLETA)
-async function showPlayerDetailsModal(playerUid) {
+async function showPlayerDetailsModal(playerUid, playerProfile) {
     const currentUser = getCurrentUser();
     if (!currentUser) {
         showNotification("Por favor, faça login para ver detalhes de outros jogadores!");
@@ -1050,13 +1054,8 @@ async function showPlayerDetailsModal(playerUid) {
     }
 
     try {
-        const playerProfile = await getUserProfile(playerUid);
-         console.log("Perfil do jogador encontrado:", playerProfile);
-
         if (playerProfile) {
-            // =======================================================
-            // ===== ESTE É O BLOCO DE CÓDIGO QUE ESTAVA FALTANDO =====
-            // =======================================================
+            // Preenche os detalhes do jogador no modal
             document.getElementById("player-detail-name").textContent = `${playerProfile.username} ${playerProfile.lastName || ""}`;
             document.getElementById("player-detail-email").textContent = playerProfile.email || "N/A";
             document.getElementById("player-detail-phone").textContent = playerProfile.phone || "N/A";
@@ -1064,11 +1063,6 @@ async function showPlayerDetailsModal(playerUid) {
             const joinDate = playerProfile.joinDate ? new Date(playerProfile.joinDate).toLocaleDateString("pt-BR") : "N/A";
             document.getElementById("player-detail-join-date").textContent = joinDate;
             document.getElementById("player-detail-config-id").textContent = playerProfile.configId || "N/A";
-            // =======================================================
-            // =======================================================
-
-            // Esta parte, que adiciona o botão, já estava correta
-            updateAddFriendButton(playerUid);
 
             // Mostra o modal
             document.getElementById("player-details-modal").style.display = "flex";
@@ -1103,7 +1097,6 @@ window.onclick = function(event) {
     const userSettingsModal = document.getElementById("user-settings-modal");
     const adminPanelModal = document.getElementById("admin-panel-modal");
     const forgotPasswordModal = document.getElementById("forgot-password-modal");
-    const privateChatModal = document.getElementById("private-chat-modal"); // NOVO: Adicione este
 
     if (event.target === loginModal) {
         hideLoginModal();
@@ -1122,9 +1115,6 @@ window.onclick = function(event) {
     }
     if (event.target === forgotPasswordModal) {
         hideForgotPasswordModal();
-    }
-    if (event.target === privateChatModal) { // NOVO: Lógica para fechar o modal de chat privado
-        closePrivateChatModal();
     }
 }
 
@@ -2216,45 +2206,22 @@ async function searchPlayerById() {
 // NOVO: Função para exibir o resultado da pesquisa de jogador (MODIFICADA)
 async function displayPlayerSearchResult(uid, profile) {
     const searchResultsContentDiv = document.getElementById('player-search-results-content');
-    searchResultsContentDiv.innerHTML = ''; // Limpa resultados anteriores
+    searchResultsContentDiv.innerHTML = '';
 
     const resultCard = document.createElement('div');
     resultCard.className = 'player-search-card';
 
-    // Cria a estrutura do card, incluindo um container para os botões
+    // A mudança crucial: Passamos o UID e o objeto 'profile' diretamente.
+    // Usamos JSON.stringify para garantir que o objeto seja passado corretamente no HTML.
     resultCard.innerHTML = `
         <h3>${profile.username} ${profile.lastName || ""}</h3>
         <p><strong>ID de Configuração:</strong> ${profile.configId}</p>
         <div class="player-search-actions" id="search-result-actions-${uid}">
-            <!-- Botões serão inseridos aqui -->
+            <button class="btn-view-details" onclick='showPlayerDetailsModal("${uid}", ${JSON.stringify(profile)})'>Ver Detalhes</button>
         </div>
     `;
     
     searchResultsContentDiv.appendChild(resultCard);
-
-    // Agora, vamos preencher os botões dinamicamente
-    const actionsContainer = document.getElementById(`search-result-actions-${uid}`);
-    const currentUser = getCurrentUser();
-
-    // 1. Adiciona o botão "Ver Detalhes"
-    actionsContainer.innerHTML += `<button class="btn-view-details" onclick="showPlayerDetailsModal('${uid}'); hidePlayerSearchResultsModal();">Ver Detalhes</button>`;
-
-    // 2. Adiciona o botão de amizade, se aplicável
-    if (currentUser && currentUser.uid !== uid) {
-        const friendshipRef = database.ref(`friendships/${currentUser.uid}/${uid}`);
-        const snapshot = await friendshipRef.once('value');
-        const friendship = snapshot.val();
-
-        let friendButtonHtml = '';
-        if (!friendship) {
-            friendButtonHtml = `<button class="btn-add-friend" onclick="sendFriendRequest('${uid}')">Enviar Pedido</button>`;
-        } else if (friendship.status === 'pending') {
-            friendButtonHtml = `<button class="btn-add-friend pending" disabled>Pedido Pendente</button>`;
-        } else if (friendship.status === 'friends') {
-            friendButtonHtml = `<button class="btn-add-friend friends" disabled>Amigos</button>`;
-        }
-        actionsContainer.innerHTML += friendButtonHtml;
-    }
 }
 
 // NOVO: Funções para o modal de resultados da busca
@@ -2378,204 +2345,6 @@ function stopWatchingPosition(uid) {
     }
 }
 
-// =================================================================
+// =================================================================    
 // ===== FIM DO CÓDIGO DE GEOLOCALIZAÇÃO ===========================
 // =================================================================
-
-
-// Função para navegação por abas no modal de configurações
-function openUserSettingsTab(evt, tabName) {
-    let i, tabcontent, tablinks;
-    tabcontent = document.getElementsByClassName("tab-content");
-    for (i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].style.display = "none";
-    }
-    tablinks = document.getElementsByClassName("tab-link");
-    for (i = 0; i < tablinks.length; i++) {
-        tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
-    document.getElementById(tabName).style.display = "block";
-    evt.currentTarget.className += " active";
-
-    // Carrega os dados da aba de amigos apenas quando ela for aberta
-    if (tabName === 'Friends') {
-        loadFriendsData();
-    }
-}
-
-// Função principal para carregar dados de amigos e pedidos
-async function loadFriendsData() {
-    const currentUser = getCurrentUser();
-    if (!currentUser) return;
-
-    const friendshipsRef = database.ref(`friendships/${currentUser.uid}`);
-    friendshipsRef.on('value', async (snapshot) => {
-        const allFriendships = snapshot.val() || {};
-        
-        const friendRequests = [];
-        const friendsList = [];
-
-        for (const friendUid in allFriendships) {
-            const friendship = allFriendships[friendUid];
-            if (friendship.status === 'pending' && friendship.sentBy !== currentUser.uid) {
-                const userProfile = await getUserProfile(friendUid);
-                friendRequests.push({ uid: friendUid, ...userProfile });
-            } else if (friendship.status === 'friends') {
-                const userProfile = await getUserProfile(friendUid);
-                friendsList.push({ uid: friendUid, ...userProfile });
-            }
-        }
-        
-        displayFriendRequests(friendRequests);
-        displayFriendsList(friendsList);
-    });
-}
-
-// Exibe a lista de pedidos de amizade
-function displayFriendRequests(requests) {
-    const container = document.getElementById('friend-requests-list');
-    if (requests.length === 0) {
-        container.innerHTML = '<p class="no-requests">Nenhum pedido de amizade pendente.</p>';
-        return;
-    }
-    container.innerHTML = requests.map(user => `
-        <div class="request-item">
-            <span class="friend-info">${user.username} ${user.lastName || ''}</span>
-            <div class="request-actions">
-                <button class="btn-accept" onclick="handleFriendRequest('${user.uid}', true)">Aceitar</button>
-                <button class="btn-decline" onclick="handleFriendRequest('${user.uid}', false)">Recusar</button>
-            </div>
-        </div>
-    `).join('');
-}
-
-// Exibe a lista de amigos
-function displayFriendsList(friends) {
-    const container = document.getElementById('friends-list-container');
-    if (friends.length === 0) {
-        container.innerHTML = '<p class="no-friends">Você ainda não adicionou nenhum amigo.</p>';
-        return;
-    }
-    container.innerHTML = friends.map(user => `
-        <div class="friend-item">
-            <span class="friend-info">${user.username} ${user.lastName || ''}</span>
-            <div class="friend-actions">
-                <button class="btn-remove-friend" onclick="removeFriend('${user.uid}')">Remover</button>
-            </div>
-        </div>
-    `).join('');
-}
-
-// Envia um pedido de amizade
-async function sendFriendRequest(recipientUid) {
-    const currentUser = getCurrentUser();
-    if (!currentUser || currentUser.uid === recipientUid) return;
-
-    const friendshipPath1 = `friendships/${currentUser.uid}/${recipientUid}`;
-    const friendshipPath2 = `friendships/${recipientUid}/${currentUser.uid}`;
-
-    const requestData = {
-        status: 'pending',
-        sentBy: currentUser.uid,
-        timestamp: new Date().toISOString()
-    };
-
-    const updates = {};
-    updates[friendshipPath1] = requestData;
-    updates[friendshipPath2] = requestData;
-
-    await database.ref().update(updates);
-    showNotification('Pedido de amizade enviado!');
-    updateAddFriendButton(recipientUid); // Atualiza o botão
-}
-
-// Aceita ou recusa um pedido de amizade
-async function handleFriendRequest(senderUid, accept) {
-    const currentUser = getCurrentUser();
-    if (!currentUser) return;
-
-    const friendshipPath1 = `friendships/${currentUser.uid}/${senderUid}`;
-    const friendshipPath2 = `friendships/${senderUid}/${currentUser.uid}`;
-
-    if (accept) {
-        const acceptData = {
-            status: 'friends',
-            since: new Date().toISOString()
-        };
-        const updates = {};
-        updates[friendshipPath1] = acceptData;
-        updates[friendshipPath2] = acceptData;
-        await database.ref().update(updates);
-        showNotification('Amigo adicionado com sucesso!');
-    } else {
-        // Remove o pedido de ambos os usuários
-        const updates = {};
-        updates[friendshipPath1] = null;
-        updates[friendshipPath2] = null;
-        await database.ref().update(updates);
-        showNotification('Pedido de amizade recusado.');
-    }
-}
-
-// Remove um amigo
-async function removeFriend(friendUid) {
-    if (!confirm('Tem certeza que deseja remover este amigo?')) return;
-    
-    const currentUser = getCurrentUser();
-    if (!currentUser) return;
-
-    const friendshipPath1 = `friendships/${currentUser.uid}/${friendUid}`;
-    const friendshipPath2 = `friendships/${friendUid}/${currentUser.uid}`;
-
-    const updates = {};
-    updates[friendshipPath1] = null;
-    updates[friendshipPath2] = null;
-    await database.ref().update(updates);
-    showNotification('Amigo removido.');
-}
-
-// Atualiza o botão "Adicionar Amigo" com base no status da amizade
-async function updateAddFriendButton(profileUid) {
-    const currentUser = getCurrentUser();
-    const actionsContainer = document.getElementById('player-profile-actions');
-    actionsContainer.innerHTML = ''; // Limpa o botão anterior
-
-    if (!currentUser || currentUser.uid === profileUid) {
-        return; // Não mostra botão para si mesmo ou se não estiver logado
-    }
-
-    const friendshipRef = database.ref(`friendships/${currentUser.uid}/${profileUid}`);
-    const snapshot = await friendshipRef.once('value');
-    const friendship = snapshot.val();
-
-    let buttonHtml = '';
-    if (!friendship) {
-        buttonHtml = `<button class="btn-add-friend" onclick="sendFriendRequest('${profileUid}')">Adicionar Amigo</button>`;
-    } else if (friendship.status === 'pending') {
-        buttonHtml = `<button class="btn-add-friend pending" disabled>Pedido Pendente</button>`;
-    } else if (friendship.status === 'friends') {
-        buttonHtml = `<button class="btn-add-friend friends" disabled>Amigos</button>`;
-    }
-    
-    actionsContainer.innerHTML = buttonHtml;
-}
-
-// Modifique a função showPlayerDetailsModal para chamar a atualização do botão
-async function showPlayerDetailsModal(playerUid) {
-    // ... (código existente da função) ...
-    try {
-        const playerProfile = await getUserProfile(playerUid);
-        if (playerProfile) {
-            // ... (código existente para preencher detalhes) ...
-            
-            // ADICIONE ESTA LINHA NO FINAL DO BLOCO 'if (playerProfile)'
-            updateAddFriendButton(playerUid);
-
-            document.getElementById("player-details-modal").style.display = "flex";
-        } else {
-            showNotification("Detalhes do jogador não encontrados.");
-        }
-    } catch (error) {
-        // ... (código de erro existente) ...
-    }
-}
