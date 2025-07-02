@@ -104,6 +104,8 @@ async function addOccupant(court, user) {
     // Não adicionamos tempo aqui, apenas quando o usuário sai
     
     showNotification(`${user.username} ${user.lastName || ""} entrou na Quadra ${court.toUpperCase()}!`);
+
+    startWatchingPosition(court, user);
 }
 
 // Remover ocupante da quadra
@@ -130,6 +132,8 @@ async function removeOccupant(court, user) {
     await saveCourtStatus(); // Salvar no Firebase
     
     showNotification(`${user.username} ${user.lastName || ""} saiu da Quadra ${court.toUpperCase()}!`);
+
+    stopWatchingPosition(user.uid);
 }
 
 // Atualizar exibição da quadra
@@ -440,10 +444,11 @@ async function handleRegister(event) {
     const password = document.getElementById("register-password").value;
     const confirmPassword = document.getElementById("register-confirm-password").value;
     const phone = document.getElementById("register-phone").value.trim();
+    const gender = document.getElementById("register-gender").value;
     const playsAt = document.getElementById("register-plays-at").value.trim();
 
     // Validações
-    if (!username || !lastName || !email || !password || !confirmPassword || !phone || !playsAt) {
+    if (!username || !lastName || !email || !password || !confirmPassword || !phone || !gender || !playsAt) {
         showNotification("Por favor, preencha todos os campos obrigatórios!");
         return;
     }
@@ -472,6 +477,7 @@ async function handleRegister(event) {
             lastName: lastName,
             email: email,
             phone: phone,
+            gender: gender,
             totalTime: 0,
             joinDate: new Date().toISOString(),
             configId: userConfigId,
@@ -2117,6 +2123,7 @@ async function showUserSettingsModal() { // Tornada async para buscar histórico
     document.getElementById("settings-full-name").textContent = `${currentUser.username} ${currentUser.lastName || ""}`; // Nome completo
     document.getElementById("settings-email").textContent = currentUser.email || "N/A";
     document.getElementById("settings-phone").textContent = currentUser.phone || "N/A";
+    document.getElementById("settings-gender").textContent = currentUser.gender || "Não informado";
     document.getElementById("settings-total-time").textContent = formatTime(currentUser.totalTime || 0);
 
     // Formatar a data de entrada
@@ -2125,6 +2132,7 @@ async function showUserSettingsModal() { // Tornada async para buscar histórico
 
     // NOVO: Preencher o ID de Configuração
     document.getElementById("settings-config-id").textContent = currentUser.configId || "N/A";
+    document.getElementById("settings-plays-at").textContent = currentUser.playsAt || "Não informado";
 
 
     // Preencher o histórico de tempo
@@ -2222,3 +2230,119 @@ function showPlayerSearchResultsModal() {
 function hidePlayerSearchResultsModal() {
     document.getElementById("player-search-results-modal").style.display = "none";
 }
+
+
+// =================================================================
+// ===== INÍCIO DO CÓDIGO DE GEOLOCALIZAÇÃO ========================
+// =================================================================
+
+// Objeto para armazenar as coordenadas das quadras
+const courtCoordinates = {
+    ceret: { lat: -23.558889, lon: -46.554167 }, // Latitude e Longitude do CERET
+    pelezao: { lat: -23.5275, lon: -46.719167 }  // Latitude e Longitude do Pelezão
+};
+
+// Objeto para armazenar o ID do monitoramento de posição de cada jogador
+const positionWatchers = {};
+
+/**
+ * Converte graus para radianos.
+ * @param {number} deg - O valor em graus.
+ * @returns {number} O valor em radianos.
+ */
+function toRad(deg) {
+    return deg * (Math.PI / 180);
+}
+
+/**
+ * Calcula a distância entre duas coordenadas geográficas usando a fórmula de Haversine.
+ * @param {number} lat1 - Latitude do ponto 1.
+ * @param {number} lon1 - Longitude do ponto 1.
+ * @param {number} lat2 - Latitude do ponto 2.
+ * @param {number} lon2 - Longitude do ponto 2.
+ * @returns {number} A distância em quilômetros.
+ */
+function haversineDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Raio da Terra em km
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const radLat1 = toRad(lat1);
+    const radLat2 = toRad(lat2);
+
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(radLat1) * Math.cos(radLat2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    
+    return R * c; // Distância em km
+}
+
+/**
+ * Inicia o monitoramento da posição do jogador para uma quadra específica.
+ * @param {string} court - O nome da quadra ('ceret' ou 'pelezao').
+ * @param {object} user - O objeto do usuário atual.
+ */
+function startWatchingPosition(court, user) {
+    // Verifica se o navegador suporta geolocalização
+    if (!navigator.geolocation) {
+        console.warn("Geolocalização não é suportada por este navegador.");
+        return;
+    }
+
+    // Para qualquer monitoramento anterior para evitar duplicatas
+    if (positionWatchers[user.uid]) {
+        stopWatchingPosition(user.uid);
+    }
+
+    const courtCoords = courtCoordinates[court];
+
+    const watcherId = navigator.geolocation.watchPosition(
+        (position) => {
+            // Sucesso ao obter a posição
+            const userLat = position.coords.latitude;
+            const userLon = position.coords.longitude;
+
+            const distance = haversineDistance(courtCoords.lat, courtCoords.lon, userLat, userLon);
+            console.log(`Distância da quadra ${court.toUpperCase()}: ${distance.toFixed(2)} km`);
+
+            // Se a distância for maior que 1 km, remove o jogador da quadra
+            if (distance > 1) {
+                showNotification(`Você se afastou mais de 1km da quadra ${court.toUpperCase()} e foi removido automaticamente.`);
+                removeOccupant(court, user); // Reutiliza a função existente para remover o jogador
+                stopWatchingPosition(user.uid); // Para o monitoramento
+            }
+        },
+        (error) => {
+            // Erro ao obter a posição
+            console.error("Erro na geolocalização:", error.message);
+            showNotification("Não foi possível obter sua localização. A remoção automática pode não funcionar.");
+            // Para o monitoramento em caso de erro para não ficar tentando indefinidamente
+            stopWatchingPosition(user.uid);
+        },
+        {
+            // Opções para alta precisão
+            enableHighAccuracy: true,
+            timeout: 10000, // Tempo máximo para obter a posição (10 segundos)
+            maximumAge: 0 // Não usar cache de posição
+        }
+    );
+
+    // Armazena o ID do watcher para poder pará-lo depois
+    positionWatchers[user.uid] = watcherId;
+    console.log(`Iniciando monitoramento de posição para o usuário ${user.username} na quadra ${court}. Watcher ID: ${watcherId}`);
+}
+
+/**
+ * Para o monitoramento da posição de um jogador.
+ * @param {string} uid - O UID do usuário.
+ */
+function stopWatchingPosition(uid) {
+    if (positionWatchers[uid]) {
+        navigator.geolocation.clearWatch(positionWatchers[uid]);
+        console.log(`Parando monitoramento de posição para o usuário ${uid}. Watcher ID: ${positionWatchers[uid]}`);
+        delete positionWatchers[uid];
+    }
+}
+
+// =================================================================
+// ===== FIM DO CÓDIGO DE GEOLOCALIZAÇÃO ===========================
+// =================================================================
