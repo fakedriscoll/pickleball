@@ -2249,8 +2249,6 @@ const positionWatchers = {};
 
 /**
  * Converte graus para radianos.
- * @param {number} deg - O valor em graus.
- * @returns {number} O valor em radianos.
  */
 function toRad(deg) {
     return deg * (Math.PI / 180);
@@ -2258,11 +2256,6 @@ function toRad(deg) {
 
 /**
  * Calcula a distância entre duas coordenadas geográficas usando a fórmula de Haversine.
- * @param {number} lat1 - Latitude do ponto 1.
- * @param {number} lon1 - Longitude do ponto 1.
- * @param {number} lat2 - Latitude do ponto 2.
- * @param {number} lon2 - Longitude do ponto 2.
- * @returns {number} A distância em quilômetros.
  */
 function haversineDistance(lat1, lon1, lat2, lon2) {
     const R = 6371; // Raio da Terra em km
@@ -2279,80 +2272,54 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
 }
 
 /**
- * Verifica a localização do usuário antes de adicioná-lo à quadra.
- * @param {string} court - O nome da quadra ('ceret' ou 'pelezao').
- * @param {object} user - O objeto do usuário atual.
+ * Inicia o monitoramento da posição do jogador para uma quadra específica.
  */
-function checkLocationAndAddOccupant(court, user) {
+function startWatchingPosition(court, user) {
     if (!navigator.geolocation) {
-        showNotification("Geolocalização não é suportada pelo seu navegador.");
+        console.warn("Geolocalização não é suportada por este navegador.");
         return;
     }
 
-    if (window.location.protocol !== 'https:' ) {
-        showNotification("A verificação de local só funciona em sites seguros (HTTPS).");
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            console.warn("Ambiente de teste detectado. Permitindo entrada sem verificação de local.");
-            addOccupant(court, user);
-            return;
-        }
-        // Se não for localhost e não for HTTPS, a função para aqui.
-        return; 
+    if (positionWatchers[user.uid]) {
+        stopWatchingPosition(user.uid);
     }
 
     const courtCoords = courtCoordinates[court];
-    showNotification("Obtendo sua localização para verificação...");
 
-    navigator.geolocation.getCurrentPosition(
-        async (position) => {
+    const watcherId = navigator.geolocation.watchPosition(
+        (position) => {
             const userLat = position.coords.latitude;
             const userLon = position.coords.longitude;
             const distance = haversineDistance(courtCoords.lat, courtCoords.lon, userLat, userLon);
-            const maxDistanceKm = 1.0;
-
-            if (distance <= maxDistanceKm) {
-                showNotification("Localização verificada. Entrando na quadra...");
-                await addOccupant(court, user);
-            } else {
-                showNotification(`Você está a ${distance.toFixed(2)} km de distância. É preciso estar a menos de ${maxDistanceKm} km para entrar.`);
+            
+            if (distance > 1) {
+                showNotification(`Você se afastou mais de 1km da quadra ${court.toUpperCase()} e foi removido automaticamente.`);
+                removeOccupant(court, user);
+                stopWatchingPosition(user.uid);
             }
         },
         (error) => {
-            let errorMessage = "Não foi possível obter sua localização. ";
-            switch(error.code) {
-                case error.PERMISSION_DENIED:
-                    errorMessage += "Você precisa permitir o acesso à localização no seu navegador.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    errorMessage += "Informações de localização indisponíveis. Verifique seu GPS.";
-                    break;
-                case error.TIMEOUT:
-                    errorMessage += "A solicitação de localização demorou muito. Tente novamente.";
-                    break;
-                default:
-                    errorMessage += "Ocorreu um erro desconhecido.";
-                    break;
-            }
-            showNotification(errorMessage);
-            console.error("Erro na geolocalização:", error);
+            console.error("Erro no monitoramento de posição:", error.message);
+            stopWatchingPosition(user.uid);
         },
         {
             enableHighAccuracy: true,
-            timeout: 15000,
+            timeout: 10000,
             maximumAge: 0
         }
     );
-    // As linhas que estavam aqui foram removidas.
+
+    positionWatchers[user.uid] = watcherId;
+    console.log(`Iniciando monitoramento de posição para o usuário ${user.username}. Watcher ID: ${watcherId}`);
 }
 
 /**
  * Para o monitoramento da posição de um jogador.
- * @param {string} uid - O UID do usuário.
  */
 function stopWatchingPosition(uid) {
     if (positionWatchers[uid]) {
         navigator.geolocation.clearWatch(positionWatchers[uid]);
-        console.log(`Parando monitoramento de posição para o usuário ${uid}. Watcher ID: ${positionWatchers[uid]}`);
+        console.log(`Parando monitoramento de posição para o usuário ${uid}.`);
         delete positionWatchers[uid];
     }
 }
