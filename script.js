@@ -82,12 +82,11 @@ async function toggleCourtStatus(court) {
     const isUserOccupying = currentOccupants[currentUser.uid];
 
     if (isUserOccupying) {
-        // Se o usuário já está na quadra, ele quer sair (não precisa de verificação de local)
+        // Se o usuário já está na quadra, ele quer sair
         await removeOccupant(court, currentUser);
     } else {
-        // Se o usuário não está na quadra, ele quer entrar.
-        // AGORA, VAMOS VERIFICAR A LOCALIZAÇÃO ANTES DE ADICIONAR.
-        checkLocationAndAddOccupant(court, currentUser);
+        // Se o usuário não está na quadra, ele quer entrar
+        await addOccupant(court, currentUser);
     }
 }
 
@@ -2280,52 +2279,66 @@ function haversineDistance(lat1, lon1, lat2, lon2) {
 }
 
 /**
- * Inicia o monitoramento da posição do jogador para uma quadra específica.
+ * Verifica a localização do usuário antes de adicioná-lo à quadra.
  * @param {string} court - O nome da quadra ('ceret' ou 'pelezao').
  * @param {object} user - O objeto do usuário atual.
  */
-function startWatchingPosition(court, user) {
-    // Verifica se o navegador suporta geolocalização
+function checkLocationAndAddOccupant(court, user) {
     if (!navigator.geolocation) {
-        console.warn("Geolocalização não é suportada por este navegador.");
+        showNotification("Geolocalização não é suportada pelo seu navegador.");
         return;
-    }
-
-    // Para qualquer monitoramento anterior para evitar duplicatas
-    if (positionWatchers[user.uid]) {
-        stopWatchingPosition(user.uid);
     }
 
     const courtCoords = courtCoordinates[court];
 
-    const watcherId = navigator.geolocation.watchPosition(
-        (position) => {
+    showNotification("Obtendo sua localização para verificação...");
+
+    // Usamos getCurrentPosition para uma verificação única e rápida.
+    navigator.geolocation.getCurrentPosition(
+        async (position) => {
             // Sucesso ao obter a posição
             const userLat = position.coords.latitude;
             const userLon = position.coords.longitude;
 
             const distance = haversineDistance(courtCoords.lat, courtCoords.lon, userLat, userLon);
-            console.log(`Distância da quadra ${court.toUpperCase()}: ${distance.toFixed(2)} km`);
+            console.log(`Distância da quadra ${court.toUpperCase()} para entrada: ${distance.toFixed(2)} km`);
 
-            // Se a distância for maior que 1 km, remove o jogador da quadra
-            if (distance > 1) {
-                showNotification(`Você se afastou mais de 1km da quadra ${court.toUpperCase()} e foi removido automaticamente.`);
-                removeOccupant(court, user); // Reutiliza a função existente para remover o jogador
-                stopWatchingPosition(user.uid); // Para o monitoramento
+            // Define o raio máximo permitido em km (1 km = 1000 metros)
+            const maxDistanceKm = 1.0;
+
+            if (distance <= maxDistanceKm) {
+                // Usuário está perto o suficiente, pode entrar na quadra.
+                showNotification("Localização verificada. Entrando na quadra...");
+                await addOccupant(court, user);
+            } else {
+                // Usuário está muito longe.
+                showNotification(`Você está a ${distance.toFixed(2)} km de distância. É preciso estar a menos de ${maxDistanceKm} km para entrar.`);
             }
         },
         (error) => {
             // Erro ao obter a posição
+            let errorMessage = "Não foi possível obter sua localização. ";
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMessage += "Você negou a permissão de acesso à localização.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMessage += "As informações de localização não estão disponíveis.";
+                    break;
+                case error.TIMEOUT:
+                    errorMessage += "A solicitação de localização expirou.";
+                    break;
+                default:
+                    errorMessage += "Ocorreu um erro desconhecido.";
+                    break;
+            }
+            showNotification(errorMessage);
             console.error("Erro na geolocalização:", error.message);
-            showNotification("Não foi possível obter sua localização. A remoção automática pode não funcionar.");
-            // Para o monitoramento em caso de erro para não ficar tentando indefinidamente
-            stopWatchingPosition(user.uid);
         },
         {
-            // Opções para alta precisão
-            enableHighAccuracy: true,
-            timeout: 10000, // Tempo máximo para obter a posição (10 segundos)
-            maximumAge: 0 // Não usar cache de posição
+            enableHighAccuracy: true, // Pede a localização mais precisa possível
+            timeout: 15000,          // Aumenta o tempo limite para 15 segundos
+            maximumAge: 0            // Força uma nova leitura da localização
         }
     );
 
