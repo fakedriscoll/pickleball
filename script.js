@@ -82,11 +82,12 @@ async function toggleCourtStatus(court) {
     const isUserOccupying = currentOccupants[currentUser.uid];
 
     if (isUserOccupying) {
-        // Se o usuário já está na quadra, ele quer sair
+        // Se o usuário já está na quadra, ele quer sair (não precisa de verificação de local)
         await removeOccupant(court, currentUser);
     } else {
-        // Se o usuário não está na quadra, ele quer entrar
-        await addOccupant(court, currentUser);
+        // Se o usuário não está na quadra, ele quer entrar.
+        // AGORA, VAMOS VERIFICAR A LOCALIZAÇÃO ANTES DE ADICIONAR.
+        checkLocationAndAddOccupant(court, currentUser);
     }
 }
 
