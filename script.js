@@ -2289,62 +2289,60 @@ function checkLocationAndAddOccupant(court, user) {
         return;
     }
 
-    const courtCoords = courtCoordinates[court];
+    if (window.location.protocol !== 'https:' ) {
+        showNotification("A verificação de local só funciona em sites seguros (HTTPS).");
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.warn("Ambiente de teste detectado. Permitindo entrada sem verificação de local.");
+            addOccupant(court, user);
+            return;
+        }
+        // Se não for localhost e não for HTTPS, a função para aqui.
+        return; 
+    }
 
+    const courtCoords = courtCoordinates[court];
     showNotification("Obtendo sua localização para verificação...");
 
-    // Usamos getCurrentPosition para uma verificação única e rápida.
     navigator.geolocation.getCurrentPosition(
         async (position) => {
-            // Sucesso ao obter a posição
             const userLat = position.coords.latitude;
             const userLon = position.coords.longitude;
-
             const distance = haversineDistance(courtCoords.lat, courtCoords.lon, userLat, userLon);
-            console.log(`Distância da quadra ${court.toUpperCase()} para entrada: ${distance.toFixed(2)} km`);
-
-            // Define o raio máximo permitido em km (1 km = 1000 metros)
             const maxDistanceKm = 1.0;
 
             if (distance <= maxDistanceKm) {
-                // Usuário está perto o suficiente, pode entrar na quadra.
                 showNotification("Localização verificada. Entrando na quadra...");
                 await addOccupant(court, user);
             } else {
-                // Usuário está muito longe.
                 showNotification(`Você está a ${distance.toFixed(2)} km de distância. É preciso estar a menos de ${maxDistanceKm} km para entrar.`);
             }
         },
         (error) => {
-            // Erro ao obter a posição
             let errorMessage = "Não foi possível obter sua localização. ";
             switch(error.code) {
                 case error.PERMISSION_DENIED:
-                    errorMessage += "Você negou a permissão de acesso à localização.";
+                    errorMessage += "Você precisa permitir o acesso à localização no seu navegador.";
                     break;
                 case error.POSITION_UNAVAILABLE:
-                    errorMessage += "As informações de localização não estão disponíveis.";
+                    errorMessage += "Informações de localização indisponíveis. Verifique seu GPS.";
                     break;
                 case error.TIMEOUT:
-                    errorMessage += "A solicitação de localização expirou.";
+                    errorMessage += "A solicitação de localização demorou muito. Tente novamente.";
                     break;
                 default:
                     errorMessage += "Ocorreu um erro desconhecido.";
                     break;
             }
             showNotification(errorMessage);
-            console.error("Erro na geolocalização:", error.message);
+            console.error("Erro na geolocalização:", error);
         },
         {
-            enableHighAccuracy: true, // Pede a localização mais precisa possível
-            timeout: 15000,          // Aumenta o tempo limite para 15 segundos
-            maximumAge: 0            // Força uma nova leitura da localização
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
         }
     );
-
-    // Armazena o ID do watcher para poder pará-lo depois
-    positionWatchers[user.uid] = watcherId;
-    console.log(`Iniciando monitoramento de posição para o usuário ${user.username} na quadra ${court}. Watcher ID: ${watcherId}`);
+    // As linhas que estavam aqui foram removidas.
 }
 
 /**
