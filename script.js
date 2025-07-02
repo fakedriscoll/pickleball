@@ -1051,6 +1051,7 @@ async function showPlayerDetailsModal(playerUid) {
 
     try {
         const playerProfile = await getUserProfile(playerUid);
+         console.log("Perfil do jogador encontrado:", playerProfile);
 
         if (playerProfile) {
             // =======================================================
