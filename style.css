@@ -2150,3 +2150,143 @@ body {
     transform: none;
 }
 
+/* Conteúdo principal do modal */
+#user-settings-modal .modal-content {
+    background: linear-gradient(145deg, #f8fafc, #eef2f7); /* Fundo com gradiente suave */
+    padding: 0; /* Remove padding para controle total */
+    border-radius: 24px; /* Bordas mais arredondadas */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    max-width: 650px; /* Um pouco mais largo para acomodar o conteúdo */
+}
+
+/* Cabeçalho do Modal */
+#user-settings-modal h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 25px 30px;
+    margin: 0;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Ícone de engrenagem no título */
+#user-settings-modal h2::before {
+    content: '⚙️';
+    font-size: 2rem;
+    line-height: 1;
+}
+
+/* Container para todo o conteúdo abaixo do header */
+.user-settings-body {
+    padding: 30px;
+}
+
+/* Detalhes do Usuário */
+.user-details {
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+/* Organização dos detalhes em grade */
+.user-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Grade responsiva */
+    gap: 20px;
+}
+
+.detail-item {
+    background-color: #f8fafc;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.detail-item strong {
+    display: block;
+    font-size: 0.85rem;
+    color: #64748b; /* Cor mais suave para o rótulo */
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-item span {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b; /* Cor escura para o valor */
+}
+
+/* Histórico de Tempo */
+.time-history {
+    margin-top: 20px;
+}
+
+.time-history h3 {
+    font-size: 1.4rem;
+    color: #334155;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+#history-list {
+    list-style: none;
+    padding: 0;
+    max-height: 250px; /* Altura máxima com rolagem */
+    overflow-y: auto;
+    padding-right: 10px; /* Espaço para a barra de rolagem */
+}
+
+/* Estilo da barra de rolagem do histórico */
+#history-list::-webkit-scrollbar {
+    width: 8px;
+}
+#history-list::-webkit-scrollbar-track {
+    background: #e2e8f0;
+    border-radius: 4px;
+}
+#history-list::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 4px;
+}
+#history-list::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* Card de cada sessão no histórico */
+#history-list li {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#history-list li:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+#history-list li span {
+    display: block;
+    font-size: 0.95rem;
+    color: #475569;
+}
+
+#history-list li span strong {
+    color: #1e293b;
+    min-width: 80px; /* Alinha os valores */
+    display: inline-block;
+}
