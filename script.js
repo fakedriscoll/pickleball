@@ -274,6 +274,7 @@ document.addEventListener("DOMContentLoaded", async function() {
     await loadCourtStatus(); // Carregar status das quadras do Firebase
     initializeAuth(); // Inicializa o listener de autenticação
     await initializeRanking();
+    await checkAndResetWeeklyTime(); // NOVO: Verifica e executa reset semanal se necessário
 
     const chatWidget = document.getElementById("chat-widget");
     if (chatWidget) {
@@ -479,6 +480,8 @@ async function handleRegister(event) {
             phone: phone,
             gender: gender,
             totalTime: 0,
+            weeklyTime: 0, // NOVO: Tempo semanal
+            lastWeeklyReset: new Date().toISOString(), // NOVO: Data do último reset semanal
             joinDate: new Date().toISOString(),
             configId: userConfigId,
             playsAt: playsAt,
@@ -657,6 +660,8 @@ async function saveUsers(users) {
                 email: user.email,
                 phone: user.phone,
                 totalTime: user.totalTime || 0, // Garante que totalTime seja salvo
+                weeklyTime: user.weeklyTime || 0, // NOVO: Garante que weeklyTime seja salvo
+                lastWeeklyReset: user.lastWeeklyReset || new Date().toISOString(), // NOVO: Garante que lastWeeklyReset seja salvo
                 joinDate: user.joinDate
             };
         }
@@ -671,6 +676,7 @@ async function addTimeToUser(uid, timeToAdd) {
     userRef.transaction((currentData) => {
         if (currentData) {
             currentData.totalTime = (currentData.totalTime || 0) + timeToAdd;
+            currentData.weeklyTime = (currentData.weeklyTime || 0) + timeToAdd; // NOVO: Adiciona ao tempo semanal
         }
         return currentData;
     }, (error, committed, snapshot) => {
@@ -680,6 +686,7 @@ async function addTimeToUser(uid, timeToAdd) {
             // Atualiza o currentUser localmente se for o mesmo usuário
             if (currentUser && currentUser.uid === uid) {
                 currentUser.totalTime = snapshot.val().totalTime;
+                currentUser.weeklyTime = snapshot.val().weeklyTime; // NOVO: Atualiza tempo semanal local
                 updateUserDisplay();
             }
             updateRankingDisplay(); // Atualiza o ranking após a mudança de tempo
@@ -687,10 +694,102 @@ async function addTimeToUser(uid, timeToAdd) {
     });
 }
 
+// NOVO: Função para verificar se é domingo e resetar o tempo semanal
+async function checkAndResetWeeklyTime() {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 = Domingo, 1 = Segunda, etc.
+    
+    // Se não for domingo, não faz nada
+    if (dayOfWeek !== 0) {
+        return;
+    }
+    
+    // Verifica se já foi feito o reset esta semana
+    const lastResetRef = database.ref("systemSettings/lastWeeklyReset");
+    const lastResetSnapshot = await lastResetRef.once("value");
+    const lastReset = lastResetSnapshot.val();
+    
+    if (lastReset) {
+        const lastResetDate = new Date(lastReset);
+        const daysSinceLastReset = Math.floor((now - lastResetDate) / (1000 * 60 * 60 * 24));
+        
+        // Se o último reset foi há menos de 7 dias, não faz o reset
+        if (daysSinceLastReset < 7) {
+            return;
+        }
+    }
+    
+    // Executa o reset semanal
+    await resetWeeklyTime();
+    
+    // Atualiza a data do último reset
+    await lastResetRef.set(now.toISOString());
+    
+    showNotification("🔄 Ranking semanal foi resetado! Nova semana começou!");
+}
+
+// NOVO: Função para resetar o tempo semanal de todos os usuários
+async function resetWeeklyTime() {
+    try {
+        const usersRef = database.ref("users");
+        const snapshot = await usersRef.once("value");
+        const usersData = snapshot.val();
+        
+        if (!usersData) {
+            return;
+        }
+        
+        const updates = {};
+        const resetDate = new Date().toISOString();
+        
+        // Prepara as atualizações para todos os usuários
+        for (const uid in usersData) {
+            updates[`users/${uid}/weeklyTime`] = 0;
+            updates[`users/${uid}/lastWeeklyReset`] = resetDate;
+        }
+        
+        // Executa todas as atualizações de uma vez
+        await database.ref().update(updates);
+        
+        // Atualiza o currentUser local se estiver logado
+        if (currentUser) {
+            currentUser.weeklyTime = 0;
+            currentUser.lastWeeklyReset = resetDate;
+            updateUserDisplay();
+        }
+        
+        // Atualiza a exibição do ranking
+        updateRankingDisplay();
+        
+        console.log("Reset semanal executado com sucesso!");
+        
+    } catch (error) {
+        console.error("Erro ao executar reset semanal:", error);
+    }
+}
+
 // Mostrar modal de ranking
 function showRankingModal() {
     updateRankingDisplay();
+    updateWeeklyRankingDisplay(); // NOVO: Atualiza também o ranking semanal
     document.getElementById("ranking-modal").style.display = "flex"; // Usar flex para centralizar
+}
+
+// NOVO: Função para alternar entre as abas do ranking
+function showRankingTab(tabType) {
+    // Remove a classe active de todas as abas e conteúdos
+    document.querySelectorAll('.ranking-tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.ranking-content').forEach(content => content.classList.remove('active'));
+    
+    // Adiciona a classe active na aba e conteúdo selecionados
+    if (tabType === 'total') {
+        document.querySelector('.ranking-tab[onclick="showRankingTab(\'total\')"]').classList.add('active');
+        document.getElementById('ranking-total-content').classList.add('active');
+    } else if (tabType === 'weekly') {
+        document.querySelector('.ranking-tab[onclick="showRankingTab(\'weekly\')"]').classList.add('active');
+        document.getElementById('ranking-weekly-content').classList.add('active');
+        updateWeeklyRankingDisplay(); // Atualiza o ranking semanal quando a aba é selecionada
+    }
 }
 
 // Esconder modal de ranking
@@ -736,6 +835,49 @@ async function updateRankingDisplay() {
                     <div class="ranking-email">${user.email}</div>
                 </div>
                 <div class="ranking-points">${formatTime(user.totalTime || 0)}</div> <!-- Exibe o tempo formatado -->
+            </div>
+        `;
+    }).join("");
+}
+
+// NOVO: Atualizar exibição do ranking semanal
+async function updateWeeklyRankingDisplay() {
+    const users = await getUsers();
+    // Ordena por weeklyTime (tempo semanal) em ordem decrescente
+    const sortedUsers = users.sort((a, b) => (b.weeklyTime || 0) - (a.weeklyTime || 0));
+    const rankingWeeklyList = document.getElementById("ranking-weekly-list");
+    
+    if (sortedUsers.length === 0) {
+        rankingWeeklyList.innerHTML = `<p style="text-align: center; color: #666;">Nenhum utilizador registado ainda.</p>`;
+        return;
+    }
+    
+    rankingWeeklyList.innerHTML = sortedUsers.map((user, index) => {
+        const position = index + 1;
+        let positionClass = "";
+        let medal = "";
+        
+        if (position === 1) {
+            positionClass = "first";
+            medal = "🥇";
+        } else if (position === 2) {
+            positionClass = "second";
+            medal = "🥈";
+        } else if (position === 3) {
+            positionClass = "third";
+            medal = "🥉";
+        }
+        
+        return `
+            <div class="ranking-item">
+                <div class="ranking-position ${positionClass}">
+                    ${medal} ${position}º
+                </div>
+                <div class="ranking-user">
+                    <div class="ranking-username">${user.username} ${user.lastName || ""}</div> <!-- Exibe nome completo -->
+                    <div class="ranking-email">${user.email}</div>
+                </div>
+                <div class="ranking-points">${formatTime(user.weeklyTime || 0)}</div> <!-- Exibe o tempo semanal formatado -->
             </div>
         `;
     }).join("");
