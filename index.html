@@ -168,9 +168,34 @@
     <div id="ranking-modal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="hideRankingModal()">&times;</span>
-            <h2>🏆 Ranking de Pontos</h2>
-            <div id="ranking-list" class="ranking-list">
-                <!-- Ranking será preenchido dinamicamente -->
+            <h2>🏆 Rankings</h2>
+            
+            <div class="ranking-modal-body">
+                <!-- Abas para ranking total e semanal -->
+                <div class="ranking-tabs">
+                    <button class="ranking-tab active" onclick="showRankingTab('total')">
+                        <span>Ranking Total</span>
+                    </button>
+                    <button class="ranking-tab" onclick="showRankingTab('weekly')">
+                        <span>Ranking Semanal</span>
+                    </button>
+                </div>
+                
+                <!-- Conteúdo do ranking total -->
+                <div id="ranking-total-content" class="ranking-content active">
+                    <h3>Tempo Total de Jogo</h3>
+                    <div id="ranking-list" class="ranking-list">
+                        <!-- Ranking total será preenchido dinamicamente -->
+                    </div>
+                </div>
+                
+                <!-- Conteúdo do ranking semanal -->
+                <div id="ranking-weekly-content" class="ranking-content">
+                    <h3>Tempo semanal</h3>
+                    <div id="ranking-weekly-list" class="ranking-list">
+                        <!-- Ranking semanal será preenchido dinamicamente -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -287,5 +312,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="script.js"></script>
+    <script src="demo-data.js"></script>
 </body>
 </html>
