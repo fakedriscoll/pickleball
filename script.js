@@ -300,28 +300,24 @@ function initializeAuth() {
         if (user) {
             const userProfile = await getUserProfile(user.uid);
 
-             currentUser = {
-            uid: user.uid,
-            username: userProfile?.username || user.email || "Usuário Desconhecido",
-            lastName: userProfile?.lastName || "",
-            email: user.email,
-            phone: userProfile?.phone || "",
-            totalTime: userProfile?.totalTime || 0,
-            joinDate: userProfile?.joinDate || new Date().toISOString(),
-            configId: userProfile?.configId || null,
-            // ESTA É A LINHA CORRETA DENTRO DO OBJETO currentUser
-            playsAt: userProfile?.playsAt || "" 
-        };
+            currentUser = {
+                uid: user.uid,
+                username: userProfile?.username || user.email || "Usuário Desconhecido",
+                lastName: userProfile?.lastName || "",
+                email: user.email,
+                phone: userProfile?.phone || "",
+                gender: userProfile?.gender || "Não informado", // ADICIONE ESTA LINHA
+                totalTime: userProfile?.totalTime || 0,
+                joinDate: userProfile?.joinDate || new Date().toISOString(),
+                configId: userProfile?.configId || null,
+                playsAt: userProfile?.playsAt || ""
+            };
             updateUserDisplay();
-
-
 
         } else {
             currentUser = null;
             updateUserDisplay();
             showNotification("Você está deslogado.");
-            // NOVO: Desvincular listener de notificações quando o usuário faz logout
-
         }
         updateRankingDisplay();
         Object.keys(courtStatus).forEach(court => updateCourtDisplay(court));
@@ -349,58 +345,56 @@ function hideLoginModal() {
 // Processar login
 async function handleLogin(event) {
     event.preventDefault();
-    
+
     const email = document.getElementById("login-email").value.trim();
     const password = document.getElementById("login-password").value;
-    
+
     if (!email || !password) {
         showNotification("Por favor, preencha todos os campos!");
         return;
     }
-    
+
     try {
-    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-    const user = userCredential.user;
-    
-    const userProfile = await getUserProfile(user.uid);
-    
-    if (userProfile && userProfile.username) {
-        currentUser = { 
-            ...userProfile, 
-            uid: user.uid,
-            // ESTA É A LINHA CORRETA DENTRO DO OBJETO currentUser
-            playsAt: userProfile.playsAt || "" 
-        };
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
 
-        updateUserDisplay();
-        showNotification(`Bem-vindo de volta, ${currentUser.username} ${currentUser.lastName || ""}!`);
-        // REMOVA A LINHA playsAt: userProfile.playsAt || "" QUE ESTAVA SOLTA AQUI
-    } else {
-        // Fallback: Se o perfil ou o username estiver faltando, usa o email como username
-        currentUser = { 
-            uid: user.uid, 
-            username: user.email || "Usuário Desconhecido", 
-            lastName: "", 
-            totalTime: userProfile?.totalTime || 0,
-            // ESTA É A LINHA CORRETA DENTRO DO OBJETO currentUser
-            playsAt: userProfile?.playsAt || "" 
-        };
-        updateUserDisplay();
-        showNotification(`Bem-vindo de volta, ${currentUser.username} ${currentUser.lastName || ""}!`);
-    }
+        const userProfile = await getUserProfile(user.uid);
 
-    hideLoginModal();
-    document.getElementById("login-form").reset();
-} catch (error) {
-    let errorMessage = "Erro ao fazer login. Por favor, tente novamente.";
-    if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
-        errorMessage = "Email ou senha incorretos.";
-    } else if (error.code === "auth/invalid-email") {
-        errorMessage = "Formato de email inválido.";
+        if (userProfile && userProfile.username) {
+            currentUser = {
+                ...userProfile,
+                uid: user.uid,
+                gender: userProfile.gender || "Não informado", // ADICIONE ESTA LINHA
+                playsAt: userProfile.playsAt || ""
+            };
+
+            updateUserDisplay();
+            showNotification(`Bem-vindo de volta, ${currentUser.username} ${currentUser.lastName || ""}!`);
+        } else {
+            currentUser = {
+                uid: user.uid,
+                username: user.email || "Usuário Desconhecido",
+                lastName: "",
+                totalTime: userProfile?.totalTime || 0,
+                gender: userProfile?.gender || "Não informado", // ADICIONE ESTA LINHA
+                playsAt: userProfile?.playsAt || ""
+            };
+            updateUserDisplay();
+            showNotification(`Bem-vindo de volta, ${currentUser.username} ${currentUser.lastName || ""}!`);
+        }
+
+        hideLoginModal();
+        document.getElementById("login-form").reset();
+    } catch (error) {
+        let errorMessage = "Erro ao fazer login. Por favor, tente novamente.";
+        if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+            errorMessage = "Email ou senha incorretos.";
+        } else if (error.code === "auth/invalid-email") {
+            errorMessage = "Formato de email inválido.";
+        }
+        showNotification(errorMessage);
+        console.error("Erro de login:", error);
     }
-    showNotification(errorMessage);
-    console.error("Erro de login:", error);
-}
 }
 
 // Logout
@@ -656,12 +650,13 @@ async function saveUsers(users) {
         if (user.uid) {
             updates["users/" + user.uid] = {
                 username: user.username,
-                lastName: user.lastName, // Garante que lastName seja salvo
+                lastName: user.lastName,
                 email: user.email,
                 phone: user.phone,
-                totalTime: user.totalTime || 0, // Garante que totalTime seja salvo
-                weeklyTime: user.weeklyTime || 0, // NOVO: Garante que weeklyTime seja salvo
-                lastWeeklyReset: user.lastWeeklyReset || new Date().toISOString(), // NOVO: Garante que lastWeeklyReset seja salvo
+                gender: user.gender, // ADICIONE ESTA LINHA
+                totalTime: user.totalTime || 0,
+                weeklyTime: user.weeklyTime || 0,
+                lastWeeklyReset: user.lastWeeklyReset || new Date().toISOString(),
                 joinDate: user.joinDate
             };
         }
