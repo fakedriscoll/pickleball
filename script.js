@@ -1790,26 +1790,39 @@ function createEventCard(event) {
         categoriesHtml = `<p class="event-categories">Categorias: ${event.categories.join(', ')}</p>`;
     }
 
+    let tripSpecificHtml = '';
+    if (event.type === 'passeio') {
+        const registrationCount = event.registrations ? Object.keys(event.registrations).length : 0;
+        tripSpecificHtml = `
+            <div class="trip-specific-info">
+                ${event.destination ? `<p class="trip-destination">🎯 Destino: ${event.destination}</p>` : ''}
+                ${event.meetingPoint ? `<p class="trip-meeting-point">📍 Ponto de Encontro: ${event.meetingPoint}</p>` : ''}
+                ${event.capacity ? `<p class="trip-capacity">👥 Vagas: ${registrationCount}/${event.capacity}</p>` : ''}
+            </div>
+        `;
+    }
+
     card.innerHTML = `
         <div class="event-header">
             <span class="event-type-icon">${typeIcon}</span>
             <h3>${event.title}</h3>
-            <span class="event-type-badge ${event.type}">${typeLabel}</span> <!-- Movi o badge para o header -->
+            <span class="event-type-badge ${event.type}">${typeLabel}</span>
         </div>
         <div class="event-info">
-            <p class="event-datetime">Início: ${formattedDate} às ${formattedTime}</p> <!-- Adiciona classe aqui também -->
+            <p class="event-datetime">${event.type === 'passeio' ? 'Saída' : 'Início'}: ${formattedDate} às ${formattedTime}</p>
             ${endDateHtml}
             ${endTimeHtml}
             ${registrationDatesHtml}
             ${categoriesHtml}
-            <p class="event-location">Local: ${event.location || 'A definir'}</p> <!-- Adiciona classe aqui também -->
+            <p class="event-location">Local: ${event.location || 'A definir'}</p>
             ${priceHtml}
+            ${tripSpecificHtml}
         </div>
         <div class="event-description">
             <p>${event.description}</p>
         </div>
         ${event.image ? `<div class="event-image-container"><img src="${event.image}" alt="${event.title}" class="event-image"></div>` : ''}
-        ${event.type === 'passeio' ? createTripRegistrationButton(event) : ''}
+        ${event.type === 'passeio' ? createTripRegistrationButton(event) : ''} <!-- PASSA O OBJETO EVENTO INTEIRO -->
         ${event.type === 'campeonato' ? createChampionshipRegistrationSection(event) : ''}
     `;
 
@@ -1817,35 +1830,35 @@ function createEventCard(event) {
 }
 
     // Criar botão de inscrição para passeios
-    function createTripRegistrationButton(trip) {
-        const currentUser = firebase.auth().currentUser;
-        if (!currentUser) {
-            return '<button class="event-register-btn" onclick="showLoginModal()">Faça login para se inscrever</button>';
-        }
-        
-        const registrations = trip.registrations || {};
-        const isRegistered = registrations[currentUser.uid];
-        const registrationCount = Object.keys(registrations).length;
-    const isFull = registrationCount >= trip.capacity;
+    function createTripRegistrationButton(event) { // Renomeado trip para event
+    const currentUser = firebase.auth().currentUser;
+    if (!currentUser) {
+        return '<button class="event-register-btn" onclick="showLoginModal()">Faça login para se inscrever</button>';
+    }
+    
+    const registrations = event.registrations || {}; // Usa event.registrations
+    const isRegistered = registrations[currentUser.uid];
+    const registrationCount = Object.keys(registrations).length;
+    const isFull = registrationCount >= event.capacity; // Usa event.capacity
     
     if (isRegistered) {
         return `
             <div class="registration-status">
                 <p class="registered">✅ Você está inscrito!</p>
-                <button class="event-unregister-btn" onclick="unregisterFromTrip('${trip.id}')">Cancelar Inscrição</button>
+                <button class="event-unregister-btn" onclick="unregisterFromTrip('${event.id}')">Cancelar Inscrição</button>
             </div>
         `;
     } else if (isFull) {
         return `
             <div class="registration-status">
-                <p class="full">❌ Passeio lotado (${registrationCount}/${trip.capacity})</p>
+                <p class="full">❌ Passeio lotado (${registrationCount}/${event.capacity})</p>
             </div>
         `;
     } else {
         return `
             <div class="registration-status">
-                <p class="available">Vagas: ${registrationCount}/${trip.capacity}</p>
-                <button class="event-register-btn" onclick="registerForTrip('${trip.id}')">Inscrever-se</button>
+                <p class="available">Vagas: ${registrationCount}/${event.capacity}</p>
+                <button class="event-register-btn" onclick="registerForTrip('${event.id}')">Inscrever-se</button>
             </div>
         `;
     }
@@ -1987,67 +2000,82 @@ function getEventTypeLabel(type) {
 }
 
 // Inscrever-se em passeio
-function registerForTrip(tripId) {
+function registerForTrip(eventId) { // Renomeado tripId para eventId para clareza
     const currentUser = firebase.auth().currentUser;
     if (!currentUser) {
+        showNotification("Por favor, faça login para se inscrever!");
         showLoginModal();
         return;
     }
     
-    // Verificar se o usuário já está inscrito
-    firebase.database().ref(`trips/${tripId}/registrations/${currentUser.uid}`).once('value', (snapshot) => {
-        if (snapshot.exists()) {
+    // Buscar o evento (passeio) na coleção 'events'
+    firebase.database().ref(`events/${eventId}`).once('value', (snapshot) => {
+        const event = snapshot.val(); // Agora 'event' é o objeto do passeio
+        
+        if (!event) {
+            console.error("Erro: Evento (passeio) não encontrado no Firebase para o ID:", eventId);
+            alert("Erro: O passeio selecionado não foi encontrado. Por favor, tente novamente.");
+            return;
+        }
+
+        // Verificar se o usuário já está inscrito
+        const registrations = event.registrations || {};
+        if (registrations[currentUser.uid]) {
             alert('Você já está inscrito neste passeio!');
             return;
         }
         
         // Verificar capacidade
-        firebase.database().ref(`trips/${tripId}`).once('value', (tripSnapshot) => {
-            const trip = tripSnapshot.val();
-            const registrations = trip.registrations || {};
-            const registrationCount = Object.keys(registrations).length;
-            
-            if (registrationCount >= trip.capacity) {
-                alert('Desculpe, este passeio já está lotado!');
-                return;
-            }
-            
-            // Registrar usuário
-            const registrationData = {
-                uid: currentUser.uid,
-                email: currentUser.email,
-                displayName: currentUser.displayName || 'Usuário',
-                registeredAt: new Date().toISOString()
-            };
-            
-            firebase.database().ref(`trips/${tripId}/registrations/${currentUser.uid}`).set(registrationData)
-                .then(() => {
-                    alert('Inscrição realizada com sucesso!');
-                    loadEvents(); // Recarregar eventos para atualizar botões
-                })
-                .catch((error) => {
-                    console.error('Erro ao se inscrever:', error);
-                    alert('Erro ao realizar inscrição. Tente novamente.');
-                });
-        });
+        const registrationCount = Object.keys(registrations).length;
+        if (registrationCount >= event.capacity) { // Usa event.capacity
+            alert('Desculpe, este passeio já está lotado!');
+            return;
+        }
+        
+        // Registrar usuário
+        const registrationData = {
+            uid: currentUser.uid,
+            email: currentUser.email,
+            displayName: `${currentUser.username} ${currentUser.lastName || ""}`.trim(), // Nome completo
+            registeredAt: new Date().toISOString()
+        };
+        
+        // Salvar a inscrição diretamente no nó do evento
+        firebase.database().ref(`events/${eventId}/registrations/${currentUser.uid}`).set(registrationData)
+            .then(() => {
+                alert('Inscrição realizada com sucesso!');
+                loadEvents(); // Recarregar eventos para atualizar botões
+            })
+            .catch((error) => {
+                console.error('Erro ao se inscrever:', error);
+                alert('Erro ao realizar inscrição. Tente novamente.');
+            });
     });
 }
 
 // Cancelar inscrição em passeio
-function unregisterFromTrip(tripId) {
+function unregisterFromTrip(eventId) { // Renomeado tripId para eventId
+    console.log("unregisterFromTrip: Função iniciada para o evento ID:", eventId); // ADICIONE ESTA LINHA
     const currentUser = firebase.auth().currentUser;
-    if (!currentUser) return;
+    if (!currentUser) {
+        console.log("unregisterFromTrip: Usuário não logado."); // ADICIONE ESTA LINHA
+        return;
+    }
     
     if (confirm('Tem certeza que deseja cancelar sua inscrição?')) {
-        firebase.database().ref(`trips/${tripId}/registrations/${currentUser.uid}`).remove()
+        // Remover a inscrição diretamente do nó do evento
+        firebase.database().ref(`events/${eventId}/registrations/${currentUser.uid}`).remove()
             .then(() => {
+                console.log("unregisterFromTrip: Inscrição cancelada com sucesso no Firebase!"); // ADICIONE ESTA LINHA
                 alert('Inscrição cancelada com sucesso!');
                 loadEvents(); // Recarregar eventos para atualizar botões
             })
             .catch((error) => {
-                console.error('Erro ao cancelar inscrição:', error);
+                console.error('unregisterFromTrip: Erro ao cancelar inscrição:', error); // ADICIONE ESTA LINHA
                 alert('Erro ao cancelar inscrição. Tente novamente.');
             });
+    } else {
+        console.log("unregisterFromTrip: Cancelamento de inscrição abortado pelo usuário."); // ADICIONE ESTA LINHA
     }
 }
 
