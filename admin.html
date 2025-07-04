@@ -14,7 +14,7 @@
             <h1>⚙️ Painel de Administração</h1>
             <div class="admin-nav">
                 <button onclick="location.href='index.html'">🏠 Voltar ao Site</button>
-                <button id="admin-logout-btn" onclick="logout()">🚪 Logout</button>
+                <button id="admin-logout-btn" onclick="logout( )">🚪 Logout</button>
             </div>
         </header>
 
@@ -32,6 +32,8 @@
                         </div>
                     </div>
                     
+                    <!-- Removido: Passeios Programados -->
+                    <!--
                     <div class="stat-card">
                         <div class="stat-icon">🚌</div>
                         <div class="stat-content">
@@ -39,6 +41,7 @@
                             <p id="active-trips-count">-</p>
                         </div>
                     </div>
+                    -->
                     
                     <div class="stat-card">
                         <div class="stat-icon">👥</div>
@@ -60,102 +63,119 @@
 
             <!-- Seção de Gestão de Eventos -->
             <section class="admin-section">
-                <h2>📅 Gestão de Eventos</h2>
-                
-                <div class="admin-card">
-                    <h3>✨ Criar Novo Evento</h3>
-                    <form id="admin-event-form" onsubmit="handleAdminEventSubmission(event)">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="admin-event-title">📝 Título do Evento</label>
-                                <input type="text" id="admin-event-title" required placeholder="Ex: Campeonato de Pickleball">
-                            </div>
-                            <div class="form-group">
-                                <label for="admin-event-type">🏷️ Tipo de Evento</label>
-                                <select id="admin-event-type" required>
-                                    <option value="">Selecione o Tipo</option>
-                                    <option value="campeonato">🏆 Campeonato</option>
-                                    <option value="novidade">📢 Novidade</option>
-                                    <option value="passeio">🚌 Passeio</option>
-                                    <option value="aula">📚 Aula Especial</option>
-                                    <option value="manutencao">🔧 Manutenção</option>
-                                    <option value="outro">📅 Outro</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <!-- NOVO CAMPO PARA CATEGORIAS -->
-                        <div class="form-group">
-                            <label for="admin-event-categories">🏷️ Categorias (separadas por vírgula)</label>
-                            <input type="text" id="admin-event-categories" placeholder="Ex: Masculino, Feminino, Duplas Mistas">
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="admin-event-date">📅 Data de Início</label>
-                                <input type="date" id="admin-event-date" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="admin-event-end-date">📅 Data de Término</label>
-                                <input type="date" id="admin-event-end-date">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="admin-event-time">⏰ Horário de Início</label>
-                                <input type="time" id="admin-event-time" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="admin-event-end-time">⏰ Horário de Término</label>
-                                <input type="time" id="admin-event-end-time">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="admin-event-registration-start-date">🗓️ Início das Inscrições</label>
-                                <input type="date" id="admin-event-registration-start-date">
-                            </div>
-                            <div class="form-group">
-                                <label for="admin-event-registration-end-date">🗓️ Fim das Inscrições</label>
-                                <input type="date" id="admin-event-registration-end-date">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="admin-event-description">📄 Descrição</label>
-                            <textarea id="admin-event-description" rows="4" required placeholder="Descreva os detalhes do evento, regras, premiação, etc..."></textarea>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="admin-event-location">📍 Local</label>
-                                <input type="text" id="admin-event-location" placeholder="Ex: Quadra CERET, Sala de reuniões...">
-                            </div>
-                            <div class="form-group">
-                                <label for="admin-event-price">💰 Preço</label>
-                                <input type="number" id="admin-event-price" step="0.01" placeholder="0.00">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="admin-event-image">🖼️ URL da Imagem</label>
-                            <input type="url" id="admin-event-image" placeholder="https://exemplo.com/imagem.jpg">
-                        </div>
-                        
-                        <button type="submit" class="btn-primary">✅ Criar Evento</button>
-                    </form>
+    <h2>📅 Gestão de Eventos</h2>
+    
+    <div class="admin-card">
+        <h3>✨ Criar Novo Evento</h3>
+        <form id="admin-event-form" onsubmit="handleAdminEventSubmission(event)">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="admin-event-title">📝 Título do Evento</label>
+                    <input type="text" id="admin-event-title" required placeholder="Ex: Campeonato de Pickleball">
+                </div>
+                <div class="form-group">
+                    <label for="admin-event-type">🏷️ Tipo de Evento</label>
+                    <select id="admin-event-type" required onchange="toggleEventTypeFields()">
+                        <option value="">Selecione o Tipo</option>
+                        <option value="campeonato">🏆 Campeonato</option>
+                        <option value="novidade">📢 Novidade</option>
+                        <option value="passeio">🚌 Passeio</option>
+                        <option value="aula">📚 Aula Especial</option>
+                        <option value="manutencao">🔧 Manutenção</option>
+                        <option value="outro">📅 Outro</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- CAMPO DE CATEGORIAS -->
+            <div id="admin-event-categories-group" class="form-group">
+                <label for="admin-event-categories">🏷️ Categorias (separadas por vírgula)</label>
+                <input type="text" id="admin-event-categories" placeholder="Ex: Masculino, Feminino, Duplas Mistas">
+            </div>
+
+            <!-- CAMPO DE CAPACIDADE MÁXIMA -->
+            <div id="admin-event-capacity-group" class="form-group" style="display: none;">
+                <label for="admin-event-capacity">👥 Capacidade Máxima</label>
+                <input type="number" id="admin-event-capacity" placeholder="Ex: 30">
+            </div>
+            
+            <div class="form-row">
+    <div class="form-group">
+        <label for="admin-event-date">📅 Data de Início</label>
+        <input type="date" id="admin-event-date" required>
+    </div>
+    <div class="form-group">
+        <label for="admin-event-time">🕐 Hora de Início</label>
+        <input type="time" id="admin-event-time">
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group">
+        <label for="admin-event-end-date">📅 Data de Término</label>
+        <input type="date" id="admin-event-end-date">
+    </div>
+    <div class="form-group">
+        <label for="admin-event-end-time">🕐 Hora de Término</label>
+        <input type="time" id="admin-event-end-time">
+    </div>
+</div>
+            
+            <!-- ENVOLVER DATAS DE INSCRIÇÃO EM UM DIV COM ID -->
+            <div id="admin-event-registration-dates-group">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="admin-event-registration-start-date">🗓️ Início das Inscrições</label>
+                        <input type="date" id="admin-event-registration-start-date">
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-event-registration-end-date">🗓️ Fim das Inscrições</label>
+                        <input type="date" id="admin-event-registration-end-date">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="admin-event-description">📄 Descrição</label>
+                <textarea id="admin-event-description" rows="4" required placeholder="Descreva os detalhes do evento, regras, premiação, etc..."></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="admin-event-location">📍 Local</label>
+                    <input type="text" id="admin-event-location" placeholder="Ex: Quadra CERET, Sala de reuniões...">
+                </div>
+                <div class="form-group">
+                    <label for="admin-event-price">💰 Preço</label>
+                    <input type="number" id="admin-event-price" step="0.01" placeholder="0.00">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="admin-event-image">🖼️ URL da Imagem</label>
+                <input type="url" id="admin-event-image" placeholder="https://exemplo.com/imagem.jpg">
+            </div>
+            
+            <button type="submit" class="btn-primary">✅ Criar Evento</button>
+        </form>
+    </div>
+            </section>
+
+            <!-- NOVA SEÇÃO: Eventos Existentes -->
+            <section class="admin-section">
+                <h2>🗂️ Eventos Existentes</h2>
+                <div id="admin-events-container" class="events-grid">
+                    <!-- Eventos serão carregados dinamicamente aqui -->
                 </div>
             </section>
 
-            <!-- Seção de Gestão de Passeios -->
+            <!-- Removido: Seção de Gestão de Passeios -->
+            <!--
             <section class="admin-section">
                 <h2>🚌 Gestão de Passeios</h2>
                 
                 <div class="admin-card">
                     <h3>🎯 Criar Novo Passeio</h3>
-                    <form id="admin-trip-form" onsubmit="handleAdminTripSubmission(event)">
+                    <form id="admin-trip-form" onsubmit="handleAdminTripSubmission(event )">
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="admin-trip-title">🎪 Nome do Passeio</label>
@@ -208,14 +228,16 @@
                     </form>
                 </div>
             </section>
+            -->
 
-            <!-- Seção de Passeios Existentes -->
+            <!-- Removido: Seção de Passeios Existentes -->
+            <!--
             <section class="admin-section">
                 <h2>🗂️ Passeios Existentes</h2>
                 <div id="admin-trips-container" class="events-grid">
-                    <!-- Passeios serão carregados dinamicamente aqui -->
                 </div>
             </section>
+            -->
 
             <!-- Seção de Anúncios -->
             <section class="admin-section">
@@ -223,7 +245,7 @@
                 
                 <div class="admin-card">
                     <h3>📣 Anunciar Aulas</h3>
-                    <form id="admin-announcement-form" onsubmit="handleAdminAnnouncement(event)">
+                    <form id="admin-announcement-form" onsubmit="handleAdminAnnouncement(event )">
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="admin-announcement-court">🏟️ Quadra</label>
@@ -262,4 +284,3 @@
     <script src="admin-script.js"></script>
 </body>
 </html>
-
