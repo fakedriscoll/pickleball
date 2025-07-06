@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogos - pickleball</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <h1>Nossos Catálogos</h1>
+  </div>
+
+  <div class="catalogs-container">
+    <!-- Catálogo de Manutenção -->
+    <div class="catalog-card maintenance-card">
+      <div class="catalog-icon">🔧</div>
+      <h2 class="catalog-title">Pickleball_Notifier</h2>
+    <p class="catalog-description">
+        #
+      </p>
+      <div class="catalog-actions">
+        <a href="../pickleball/index.html" class="catalog-button">
+          ENTRAR
+        </a>
+      </div>
+    </div>
+
+    <!-- Catálogo de Vendas -->
+    <div class="catalog-card sales-card">
+      <div class="catalog-icon">🛒</div>
+      <h2 class="catalog-title">CONTROLE</h2>
+      <p class="catalog-description">
+        #
+      </p>
+      <div class="catalog-actions">
+        <a href="../controle/controle.html" class="catalog-button">
+          ENTRAR
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Adicionar interatividade extra
+    document.addEventListener('DOMContentLoaded', function() {
+      const cards = document.querySelectorAll('.catalog-card');
+      
+      cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'perspective(1000px) rotateX(0deg) translateY(-10px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'perspective(1000px) rotateX(5deg) translateY(0) scale(1)';
+        });
+      });
+
+      // Placeholder para quando os links dos sites estiverem prontos
+      document.getElementById('maintenance-site-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('Link do site de manutenção será adicionado aqui quando estiver pronto!');
+      });
+
+      document.getElementById('sales-site-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('Site de vendas em desenvolvimento. Em breve estará disponível!');
+      });
+    });
+  </script>
+</body>
+</html>
+
