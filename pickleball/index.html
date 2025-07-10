@@ -221,7 +221,8 @@
             <div class="modal-tabs">
                 <button class="tab-link active" onclick="openSettingsTab(event, 'Details')">Detalhes</button>
                 <button class="tab-link" onclick="openSettingsTab(event, 'History')">Histórico</button>
-                <button class="tab-link" onclick="openSettingsTab(event, 'Friends')">Amigos</button>
+                <button class="tab-link" onclick="openSettingsTab(event, 'Friends')">Amigos
+                <span id="friend-request-badge" class="notification-badge"></span>
             </div>
 
             <div class="user-settings-body">
@@ -303,6 +304,19 @@
             <div class="chat-input">
                 <input type="text" id="chat-message-input" placeholder="Digite sua mensagem...">
                 <button id="chat-send-btn">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOVO: Modal de Ações do Jogador -->
+    <div id="player-actions-modal" class="modal">
+        <div class="modal-content player-actions-content">
+            <span class="close" onclick="hidePlayerActionsModal()">&times;</span>
+            <h3 id="player-actions-name">Ações para Jogador</h3>
+            <div class="player-actions-buttons">
+                <button id="player-actions-profile-btn" class="action-btn profile">Ver Perfil Completo</button>
+                <button id="player-actions-whatsapp-btn" class="action-btn whatsapp">Conversar no WhatsApp</button>
+                <!-- Outros botões de ação podem ser adicionados aqui no futuro -->
             </div>
         </div>
     </div>
