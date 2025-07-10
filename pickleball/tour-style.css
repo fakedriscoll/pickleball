@@ -19,6 +19,7 @@
     border-radius: var(--tour-border-radius) !important;
     box-shadow: var(--tour-box-shadow) !important;
     max-width: 400px !important;
+    width: 90vw; /* Garante que não exceda a largura da tela em dispositivos pequenos */
     border: none !important;
     filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
     opacity: 0;
@@ -100,6 +101,97 @@
     cursor: pointer !important;
     transition: all 0.3s ease !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Botão principal (Próximo, Finalizar) */
+.shepherd-button.shepherd-button-primary {
+    background: var(--tour-primary-gradient) !important;
+    color: white !important;
+}
+
+.shepherd-button.shepherd-button-primary:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4) !important;
+}
+
+/* Botão secundário (Voltar) */
+.shepherd-button.shepherd-button-secondary {
+    background-color: #e2e8f0 !important;
+    color: var(--tour-text-secondary) !important;
+}
+
+.shepherd-button.shepherd-button-secondary:hover {
+    background-color: #cbd5e1 !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Seta que aponta para o elemento */
+.shepherd-arrow, .shepherd-arrow:before {
+    display: none !important; /* Remove a seta padrão para um visual mais limpo e centralizado */
+}
+
+/* Fundo escurecido (overlay) */
+.shepherd-modal-overlay {
+    background: rgba(38, 41, 46, 0.7) !important;
+    backdrop-filter: blur(5px) !important; /* Efeito de vidro fosco */
+    transition: opacity 0.3s ease !important;
+}
+
+/* --- AJUSTES DE RESPONSIVIDADE PARA CELULAR E TABLET --- */
+@media (max-width: 768px) {
+    .shepherd-element {
+        max-width: 350px !important; /* Reduz a largura máxima em tablets */
+    }
+
+    .shepherd-title {
+        font-size: 1.2rem !important; /* Diminui o título */
+    }
+
+    .shepherd-text {
+        padding: 20px !important; /* Reduz o padding do texto */
+        font-size: 0.95rem !important; /* Diminui a fonte do texto */
+    }
+
+    .shepherd-footer {
+        padding: 0 20px 20px !important; /* Reduz o padding do rodapé */
+        flex-direction: column-reverse; /* Empilha os botões */
+        gap: 10px; /* Adiciona espaço entre os botões empilhados */
+    }
+
+    .shepherd-button {
+        width: 100%; /* Faz os botões ocuparem a largura total */
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .shepherd-element {
+        max-width: 90vw !important; /* Usa a largura da viewport em celulares */
+        border-radius: 12px !important; /* Bordas um pouco menores */
+    }
+
+    .shepherd-header {
+        padding: 15px 20px !important; /* Menos padding no cabeçalho */
+    }
+
+    .shepherd-title {
+        font-size: 1.1rem !important;
+    }
+
+    .shepherd-text {
+        padding: 15px !important;
+        font-size: 0.9rem !important;
+    }
+
+    .shepherd-footer {
+        padding: 0 15px 15px !important;
+    }
+
+    .shepherd-button {
+        padding: 10px 20px !important; /* Botões um pouco menores */
+        font-size: 0.9rem !important;
+    }
 }
 
 /* Botão principal (Próximo, Finalizar) */
