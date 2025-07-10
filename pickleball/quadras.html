@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quadras de Pickleball</title>
+    <link rel="stylesheet" href="/pickleball/style.css">
+    <link rel="icon" href="LOGO.png" type="image/x-icon">
+</head>
+<body>
+    <div class="user-bar">
+        <div class="user-info">
+            <span id="user-display" onclick="showUserSettingsModal( )">Visitante</span>
+            <span id="user-points" class="points">0 pts</span>
+        </div>
+        <div class="user-actions">
+            <button id="back-to-home-btn" onclick="location.href='index.html'">🏠 Voltar ao Início</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>🏟️ Quadras de Pickleball</h1>
+        <p class="intro-text">Conheça as principais quadras de pickleball da região onde você pode praticar este esporte incrível!</p>
+
+        <div class="courts-grid">
+            <!-- CERET -->
+            <div class="court-card featured">
+                <div class="court-header">
+                    <h2>CERET</h2>
+                    <span class="location-badge">Vila Formosa</span>
+                </div>
+                <div class="court-info">
+                    <div class="info-item">
+                        <span class="icon">📍</span>
+                        <span class="text">Vila Formosa, São Paulo</span>
+                    </div>
+                    <div class="info-item special">
+                        <span class="icon">🎓</span>
+                        <span class="text">Aulas disponíveis nesta quadra!</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🏓</span>
+                        <span class="text">Quadra oficial para competições</span>
+                    </div>
+                </div>
+                <div class="court-image-placeholder">
+                    <img src="" alt="Quadra CERET" style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+                    <p><em>Foto da quadra CERET - Vila Formosa</em></p>
+                </div>
+            </div>
+
+            <!-- PELEZÃO -->
+            <div class="court-card featured">
+                <div class="court-header">
+                    <h2>PELEZÃO</h2>
+                    <span class="location-badge">Lapa</span>
+                </div>
+                <div class="court-info">
+                    <div class="info-item">
+                        <span class="icon">📍</span>
+                        <span class="text">Lapa, São Paulo</span>
+                    </div>
+                    <div class="info-item special">
+                        <span class="icon">🎓</span>
+                        <span class="text">Aulas disponíveis nesta quadra!</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🏓</span>
+                        <span class="text">Ambiente familiar e acolhedor</span>
+                    </div>
+                </div>
+                <div class="court-image-placeholder">
+                    <img src="" alt="Quadra Pelezão" style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+                    <p><em>Foto da quadra Pelezão - Lapa</em></p>
+                </div>
+            </div>
+
+            <!-- SESI -->
+            <div class="court-card">
+                <div class="court-header">
+                    <h2>SESI</h2>
+                    <span class="location-badge">Vila Leopoldina</span>
+                </div>
+                <div class="court-info">
+                    <div class="info-item">
+                        <span class="icon">📍</span>
+                        <span class="text">Vila Leopoldina, São Paulo</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🏢</span>
+                        <span class="text">Estrutura completa do SESI</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🏓</span>
+                        <span class="text">Quadras modernas e bem equipadas</span>
+                    </div>
+                </div>
+                <div class="court-image-placeholder">
+                    <img src="" alt="Quadra SESI" style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+                    <p><em>Foto da quadra SESI - Vila Leopoldina</em></p>
+                </div>
+            </div>
+
+            <!-- AYA -->
+            <div class="court-card">
+                <div class="court-header">
+                    <h2>AYA</h2>
+                    <span class="location-badge">Vila Vermelha</span>
+                </div>
+                <div class="court-info">
+                    <div class="info-item">
+                        <span class="icon">📍</span>
+                        <span class="text">Vila Vermelha, São Paulo</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🌟</span>
+                        <span class="text">Ambiente moderno e aconchegante</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🏓</span>
+                        <span class="text">Ideal para se divertir em amigos e família</span>
+                    </div>
+                </div>
+                <div class="court-image-placeholder">
+                    <img src="" alt="Quadra AYA" style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+                    <p><em>Foto da quadra AYA - Vila Vermelha</em></p>
+                </div>
+            </div>
+
+            <!-- CASA VERDE -->
+            <div class="court-card">
+                <div class="court-header">
+                    <h2>CASA VERDE</h2>
+                    <span class="location-badge">Limão</span>
+                </div>
+                <div class="court-info">
+                    <div class="info-item">
+                        <span class="icon">📍</span>
+                        <span class="text">Limão, São Paulo</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">😌</span>
+                        <span class="text">Ambiente perfeito para treinos e jogos</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🏓</span>
+                        <span class="text">Perfeito para relaxar jogando</span>
+                    </div>
+                </div>
+                <div class="court-image-placeholder">
+                    <img src="" alt="Quadra Casa Verde" style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+                    <p><em>Foto da quadra Casa Verde - Limão</em></p>
+                </div>
+            </div>
+
+            <!-- BOLA FURADA -->
+            <div class="court-card">
+                <div class="court-header">
+                    <h2>BOLA FURADA</h2>
+                    <span class="location-badge">Santo Amaro</span>
+                </div>
+                <div class="court-info">
+                    <div class="info-item">
+                        <span class="icon">📍</span>
+                        <span class="text">Santo Amaro, São Paulo</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">😄</span>
+                        <span class="text">Nome divertido, jogo sério!</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🏓</span>
+                        <span class="text">Comunidade ativa de jogadores</span>
+                    </div>
+                </div>
+                <div class="court-image-placeholder">
+                    <img src="" alt="Quadra Bola Furada" style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+                    <p><em>Foto da quadra Bola Furada - Santo Amaro</em></p>
+                </div>
+            </div>
+
+            <!-- PICKLEBALL POINT -->
+            <div class="court-card">
+                <div class="court-header">
+                    <h2>PICKLEBALL POINT</h2>
+                    <span class="location-badge">Chácara Santo Antônio</span>
+                </div>
+                <div class="court-info">
+                    <div class="info-item">
+                        <span class="icon">📍</span>
+                        <span class="text">Chácara Santo Antônio, São Paulo</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🎯</span>
+                        <span class="text">Especializada em pickleball</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="icon">🏓</span>
+                        <span class="text">Equipamentos de alta qualidade</span>
+                    </div>
+                </div>
+                <div class="court-image-placeholder">
+                    <img src="" alt="Quadra Pickleball Point" style="width:100%; height:200px; object-fit:cover; border-radius:10px;">
+                    <p><em>Foto da quadra Pickleball Point - Chácara Santo Antônio</em></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2>📋 Informações Importantes</h2>
+            <div class="info-cards">
+                <div class="info-card">
+                    <h3>🎓 Aulas</h3>
+                    <p>As quadras <strong>CERET</strong> e <strong>PELEZÃO</strong> oferecem aulas regulares de pickleball para todos os níveis. Entre em contato para mais informações sobre horários e valores.</p>
+                </div>
+                <div class="info-card">
+                    <h3>📞 Contato</h3>
+                    <p>Para informações sobre horários, reservas e disponibilidade das quadras, entre em contato diretamente com cada estabelecimento.</p>
+                </div>
+                <div class="info-card">
+                    <h3>🚗 Como Chegar</h3>
+                    <p>Todas as quadras estão localizadas em pontos estratégicos da cidade de São Paulo, com fácil acesso por transporte público e particular.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="/pickleball/firebase-config.js"></script>
+    <script src="/pickleball/script.js"></script>
+</body>
+</html>

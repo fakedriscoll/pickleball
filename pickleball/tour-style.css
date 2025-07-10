@@ -1,0 +1,138 @@
+/*
+ * Estilo customizado e robusto para o Shepherd.js Tour
+ * Design para o Pickleball Notifier
+ */
+
+:root {
+    --tour-primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --tour-background: #ffffff;
+    --tour-text-primary: #2d3748;
+    --tour-text-secondary: #4a5568;
+    --tour-border-radius: 16px;
+    --tour-arrow-size: 1.5rem;
+    --tour-box-shadow: 0 15px 40px rgba(38, 41, 46, 0.25), 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Força a aplicação dos nossos estilos sobre os padrões da biblioteca */
+.shepherd-element {
+    background: var(--tour-background) !important;
+    border-radius: var(--tour-border-radius) !important;
+    box-shadow: var(--tour-box-shadow) !important;
+    max-width: 400px !important;
+    border: none !important;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
+    opacity: 0;
+    animation: shepherd-pop-in 0.4s ease-out forwards;
+}
+
+@keyframes shepherd-pop-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Cabeçalho do tour */
+.shepherd-header {
+    background: var(--tour-primary-gradient) !important;
+    padding: 20px 25px !important;
+    border-top-left-radius: var(--tour-border-radius) !important;
+    border-top-right-radius: var(--tour-border-radius) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Título no cabeçalho */
+.shepherd-title {
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 1.4rem !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Botão de fechar (X) */
+.shepherd-cancel-icon {
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: 1.5rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.shepherd-cancel-icon:hover {
+    color: white !important;
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* Corpo do texto do tour */
+.shepherd-text {
+    padding: 25px !important;
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+    color: var(--tour-text-secondary) !important;
+}
+
+/* Rodapé onde ficam os botões */
+.shepherd-footer {
+    padding: 0 25px 25px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border-top: 1px solid #f0f2f5;
+    background-color: #f8fafc;
+    border-bottom-left-radius: var(--tour-border-radius);
+    border-bottom-right-radius: var(--tour-border-radius);
+}
+
+/* Estilo geral dos botões */
+.shepherd-button {
+    border: none !important;
+    padding: 12px 24px !important;
+    border-radius: 25px !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Botão principal (Próximo, Finalizar) */
+.shepherd-button.shepherd-button-primary {
+    background: var(--tour-primary-gradient) !important;
+    color: white !important;
+}
+
+.shepherd-button.shepherd-button-primary:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4) !important;
+}
+
+/* Botão secundário (Voltar) */
+.shepherd-button.shepherd-button-secondary {
+    background-color: #e2e8f0 !important;
+    color: var(--tour-text-secondary) !important;
+}
+
+.shepherd-button.shepherd-button-secondary:hover {
+    background-color: #cbd5e1 !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Seta que aponta para o elemento */
+.shepherd-arrow, .shepherd-arrow:before {
+    display: none !important; /* Remove a seta padrão para um visual mais limpo e centralizado */
+}
+
+/* Fundo escurecido (overlay) */
+.shepherd-modal-overlay {
+    background: rgba(38, 41, 46, 0.7) !important;
+    backdrop-filter: blur(5px) !important; /* Efeito de vidro fosco */
+    transition: opacity 0.3s ease !important;
+}
