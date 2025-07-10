@@ -592,11 +592,11 @@ body {
 
 .ranking-tab {
     flex: 1;
-    padding: 15px 25px;
+    padding: 15px 20px; /* Ajuste no padding para caber 3 abas */
     background: transparent;
     border: none;
     cursor: pointer;
-    font-size: 1.1rem;
+    font-size: 1rem; /* Diminuir um pouco a fonte */
     font-weight: 700;
     color: #64748b;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -605,6 +605,7 @@ body {
     overflow: hidden;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    white-space: nowrap; /* Impede que o texto quebre */
 }
 
 .ranking-tab::before {
@@ -3524,12 +3525,10 @@ body {
     text-align: left;
 }
 
-.friends-section h3 {
-    font-size: 1.4rem;
+.friends-section h4 {
+    font-size: 1.2rem;
     color: #334155;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 15px;
 }
 
 .add-friend-form {
@@ -3555,6 +3554,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    white-space: nowrap;
 }
 
 .add-friend-form button:hover {
@@ -3564,49 +3564,46 @@ body {
 
 #friends-list {
     list-style: none;
-    padding: 5px; /* Pequeno padding para não colar nas bordas */
+    padding: 5px;
     margin: 10px 0 0 0;
-    display: flex; /* MUDANÇA PRINCIPAL: Usando Flexbox */
-    flex-direction: column; /* Organiza os itens em uma coluna */
-    gap: 12px; /* Espaçamento vertical entre os cards */
-    max-height: 320px; /* Altura máxima para habilitar rolagem */
-    overflow-y: auto; /* Habilita a rolagem vertical se necessário */
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 320px;
+    overflow-y: auto;
 }
 
-/* Barra de rolagem personalizada para um visual mais limpo */
 #friends-list::-webkit-scrollbar {
     width: 6px;
 }
 #friends-list::-webkit-scrollbar-track {
-    background: #f8fafc; /* Fundo da trilha da rolagem */
+    background: #f8fafc;
     border-radius: 3px;
 }
 #friends-list::-webkit-scrollbar-thumb {
-    background: #d1d5db; /* Cor da barra de rolagem */
+    background: #d1d5db;
     border-radius: 3px;
 }
 #friends-list::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af; /* Cor ao passar o mouse */
+    background: #9ca3af;
 }
 
-/* Card individual de cada amigo - Estilo aprimorado */
 .friend-card {
     display: flex;
     align-items: center;
     background-color: #ffffff;
     padding: 12px;
-    border-radius: 10px; /* Bordas mais suaves */
-    box-shadow: 0 2px 8px rgba(100, 116, 139, 0.12); /* Sombra mais sutil */
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(100, 116, 139, 0.12);
     border: 1px solid #f1f5f9;
     transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
 }
 
 .friend-card:hover {
-    transform: translateY(-3px) scale(1.01); /* Efeito de elevação sutil */
+    transform: translateY(-3px) scale(1.01);
     box-shadow: 0 5px 15px rgba(100, 116, 139, 0.15);
 }
 
-/* Avatar do amigo (círculo com iniciais) */
 .friend-avatar {
     width: 45px;
     height: 45px;
@@ -3616,14 +3613,13 @@ body {
     justify-content: center;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #475569; /* Cor mais escura para as iniciais */
+    color: #475569;
     margin-right: 12px;
     flex-shrink: 0;
-    border: 2px solid white; /* Borda interna para destacar */
-    box-shadow: 0 0 0 2px #e2e8f0; /* Borda externa sutil */
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #e2e8f0;
 }
 
-/* Detalhes do amigo (nome e ID) */
 .friend-details {
     display: flex;
     flex-direction: column;
@@ -3652,7 +3648,6 @@ body {
     margin-top: 3px;
 }
 
-/* Botão de remover amigo - Design mais integrado */
 .remove-friend-btn {
     background-color: transparent;
     color: #cbd5e1;
@@ -3672,12 +3667,11 @@ body {
 }
 
 .remove-friend-btn:hover {
-    background-color: #ef4444; /* Vermelho */
+    background-color: #ef4444;
     color: white;
     transform: rotate(90deg);
 }
 
-/* Estados de carregamento e vazio - Melhorando a aparência */
 #friends-list .loading-state,
 #friends-list .empty-state {
     text-align: center;
@@ -3690,15 +3684,13 @@ body {
     border-radius: 10px;
 }
 
-/* NOVO: Estilos para a Seção de Solicitações de Amizade */
 .friend-requests-section {
     margin-bottom: 30px;
     padding-bottom: 20px;
     border-bottom: 1px solid #e2e8f0;
 }
 
-.friend-requests-section h4,
-.friends-section h4 {
+.friend-requests-section h4 {
     font-size: 1.2rem;
     color: #334155;
     margin-bottom: 15px;
@@ -3713,7 +3705,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #fffbe6; /* Fundo amarelo claro para destaque */
+    background-color: #fffbe6;
     padding: 12px 15px;
     border-radius: 12px;
     margin-bottom: 10px;
@@ -3739,7 +3731,7 @@ body {
 }
 
 .accept-request-btn {
-    background-color: #28a745; /* Verde */
+    background-color: #28a745;
 }
 
 .accept-request-btn:hover {
@@ -3748,7 +3740,7 @@ body {
 }
 
 .reject-request-btn {
-    background-color: #dc3545; /* Vermelho */
+    background-color: #dc3545;
 }
 
 .reject-request-btn:hover {
