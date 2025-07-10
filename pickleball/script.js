@@ -844,15 +844,20 @@ function showRankingTab(tabType) {
     // Remove a classe active de todas as abas e conteúdos
     document.querySelectorAll('.ranking-tab').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.ranking-content').forEach(content => content.classList.remove('active'));
+
+    const tabButton = document.querySelector(`.ranking-tab[onclick="showRankingTab('${tabType}')"]`);
+    const contentDiv = document.getElementById(`ranking-${tabType}-content`);
+
+    if (tabButton) tabButton.classList.add('active');
+    if (contentDiv) contentDiv.classList.add('active');
     
-    // Adiciona a classe active na aba e conteúdo selecionados
+    // Atualiza o ranking específico quando a aba é selecionada
     if (tabType === 'total') {
-        document.querySelector('.ranking-tab[onclick="showRankingTab(\'total\')"]').classList.add('active');
-        document.getElementById('ranking-total-content').classList.add('active');
+        updateRankingDisplay();
     } else if (tabType === 'weekly') {
-        document.querySelector('.ranking-tab[onclick="showRankingTab(\'weekly\')"]').classList.add('active');
-        document.getElementById('ranking-weekly-content').classList.add('active');
-        updateWeeklyRankingDisplay(); // Atualiza o ranking semanal quando a aba é selecionada
+        updateWeeklyRankingDisplay();
+    } else if (tabType === 'friends') {
+        updateFriendsRankingDisplay(); // Chama a nova função
     }
 }
 
@@ -953,6 +958,97 @@ async function initializeRanking() {
     // Agora, o ranking dependerá apenas dos usuários reais cadastrados.
     // Se você precisar de usuários de exemplo para testes, adicione-os manualmente
     // ou reintroduza um bloco similar, mas com uma condição para não rodar em produção.
+}
+
+async function updateFriendsRankingDisplay() {
+    const rankingList = document.getElementById("ranking-friends-list");
+    const currentUser = getCurrentUser();
+
+    if (!currentUser) {
+        rankingList.innerHTML = `<div class="ranking-empty"><div class="ranking-empty-text">Faça login para ver o ranking de amigos.</div></div>`;
+        return;
+    }
+
+    showRankingLoading(rankingList); // Mostra o spinner de carregamento
+
+    try {
+        const friendsRef = database.ref(`users/${currentUser.uid}/friends`);
+        const snapshot = await friendsRef.once('value');
+        const friends = snapshot.val();
+
+        if (!friends) {
+            showRankingEmpty(rankingList, "Você ainda não tem amigos.", "Adicione amigos para competir!");
+            return;
+        }
+
+        const friendUids = Object.keys(friends);
+        const friendPromises = friendUids.map(uid => getUserProfile(uid));
+        const friendProfiles = await Promise.all(friendPromises);
+
+        // Inclui o próprio usuário na lista para comparação
+        const currentUserProfile = await getUserProfile(currentUser.uid);
+        const allPlayers = [...friendProfiles, currentUserProfile];
+
+        // Filtra perfis nulos e ordena por tempo total
+        const sortedPlayers = allPlayers
+            .filter(p => p) // Garante que não há perfis nulos
+            .sort((a, b) => (b.totalTime || 0) - (a.totalTime || 0));
+
+        if (sortedPlayers.length === 0) {
+            showRankingEmpty(rankingList, "Nenhum dado de amigo encontrado.");
+            return;
+        }
+
+        rankingList.innerHTML = sortedPlayers.map((user, index) => {
+            const position = index + 1;
+            let positionClass = "";
+            let medal = "";
+            
+            if (position === 1) { positionClass = "first"; medal = "🥇"; }
+            else if (position === 2) { positionClass = "second"; medal = "🥈"; }
+            else if (position === 3) { positionClass = "third"; medal = "🥉"; }
+
+            const isCurrentUserClass = user.email === currentUser.email ? 'current-user-highlight' : '';
+            
+            return `
+                <div class="ranking-item ${isCurrentUserClass}">
+                    <div class="ranking-position ${positionClass}">
+                        ${medal} ${position}º
+                    </div>
+                    <div class="ranking-user">
+                        <div class="ranking-username">${user.username} ${user.lastName || ""}</div>
+                        <div class="ranking-email">${user.email}</div>
+                    </div>
+                    <div class="ranking-points">${formatTime(user.totalTime || 0)}</div>
+                </div>
+            `;
+        }).join("");
+
+    } catch (error) {
+        console.error("Erro ao carregar ranking de amigos:", error);
+        rankingList.innerHTML = `<div class="ranking-empty"><div class="ranking-empty-text">Ocorreu um erro ao carregar o ranking.</div></div>`;
+    }
+}
+
+// Função auxiliar para mostrar estado de carregamento
+function showRankingLoading(container) {
+    container.innerHTML = `
+        <div class="ranking-loading">
+            <div class="ranking-loading-spinner"></div>
+            <div class="ranking-loading-text">Carregando...</div>
+        </div>
+    `;
+}
+
+// Função auxiliar para mostrar estado vazio
+function showRankingEmpty(container, message, subtext = "Adicione amigos e comece a competir!") {
+    container.innerHTML = `
+        <div class="ranking-empty">
+            <div class="ranking-empty-icon">👥</div>
+            <div class="ranking-empty-text">${message}</div>
+            <div class="ranking-empty-subtext">${subtext}</div>
+        </div>
+    `;
 }
 
 // Funções do Chat
@@ -2739,4 +2835,3 @@ async function removeFriend(friendUid) {
 
     document.getElementById("user-settings-modal").style.display = "flex";
 }
-
