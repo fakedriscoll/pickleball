@@ -13,7 +13,7 @@
     <!-- Barra de utilizador -->
     <div class="user-bar">
         <div class="user-info">
-            <span id="user-display" onclick="showUserSettingsModal(  )">Visitante</span>
+            <span id="user-display" onclick="showUserSettingsModal(   )">Visitante</span>
             <span id="user-points" class="points">0 pts</span>
         </div>
 
@@ -173,13 +173,16 @@
             <h2>🏆 Rankings</h2>
             
             <div class="ranking-modal-body">
-                <!-- Abas para ranking total e semanal -->
+                <!-- Abas para os rankings -->
                 <div class="ranking-tabs">
                     <button class="ranking-tab active" onclick="showRankingTab('total')">
-                        <span>Ranking Total</span>
+                        <span>Geral</span>
                     </button>
                     <button class="ranking-tab" onclick="showRankingTab('weekly')">
-                        <span>Ranking Semanal</span>
+                        <span>Semanal</span>
+                    </button>
+                    <button class="ranking-tab" onclick="showRankingTab('friends')">
+                        <span>Amigos</span>
                     </button>
                 </div>
                 
@@ -193,9 +196,17 @@
                 
                 <!-- Conteúdo do ranking semanal -->
                 <div id="ranking-weekly-content" class="ranking-content">
-                    <h3>Tempo semanal</h3>
+                    <h3>Tempo Semanal</h3>
                     <div id="ranking-weekly-list" class="ranking-list">
                         <!-- Ranking semanal será preenchido dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- NOVO: Conteúdo do ranking de amigos -->
+                <div id="ranking-friends-content" class="ranking-content">
+                    <h3>Ranking de Amigos (Tempo Total)</h3>
+                    <div id="ranking-friends-list" class="ranking-list">
+                        <!-- Ranking de amigos será preenchido dinamicamente -->
                     </div>
                 </div>
             </div>
