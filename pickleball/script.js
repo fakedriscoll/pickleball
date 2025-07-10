@@ -13,6 +13,7 @@ let courtStatus = {
 const announcementsRef = database.ref("announcements"); // NOVO: Referência para anúncios
 const chatRef = database.ref("messages");
 
+let selectedPlayerForAction = null;
 
 // NOVO: Lista de emails de administradores
 const adminEmails = [
@@ -375,7 +376,7 @@ function initializeAuth() {
                 lastName: userProfile?.lastName || "",
                 email: user.email,
                 phone: userProfile?.phone || "",
-                gender: userProfile?.gender || "Não informado", // ADICIONE ESTA LINHA
+                gender: userProfile?.gender || "Não informado", 
                 totalTime: userProfile?.totalTime || 0,
                 joinDate: userProfile?.joinDate || new Date().toISOString(),
                 configId: userProfile?.configId || null,
@@ -383,12 +384,17 @@ function initializeAuth() {
             };
             updateUserDisplay();
 
+            listenForFriendRequests(user.uid);
+
         } else {
             currentUser = null;
             updateUserDisplay();
             showNotification("Você está deslogado.");
+            // (Opcional) Desligar o listener ao fazer logout, se necessário
+            const badge = document.getElementById('friend-request-badge');
+            if (badge) badge.classList.remove('visible');
         }
-        updateRankingDisplay();
+         updateRankingDisplay();
         Object.keys(courtStatus).forEach(court => updateCourtDisplay(court));
         updateAdminButtonVisibility();
     });
@@ -1849,9 +1855,56 @@ async function deleteEvent(eventId) {
     }
 }
 
+// NOVA FUNÇÃO PARA BUSCAR JOGADOR PELO ID NA PÁGINA INICIAL
+async function searchPlayerById() {
+    const searchId = document.getElementById('player-search-id').value.trim();
+    if (!searchId) {
+        showNotification("Por favor, insira um ID para buscar.");
+        return;
+    }
 
+    try {
+        // 1. Referência para o nó 'users' no Firebase
+        const usersRef = firebase.database().ref('users');
+        
+        // 2. Consulta para encontrar o usuário com o 'configId' correspondente
+        const snapshot = await usersRef.orderByChild('configId').equalTo(searchId).once('value');
 
+        if (snapshot.exists()) {
+            // 3. Se o usuário for encontrado, pegue os dados
+            const usersData = snapshot.val();
+            const playerUid = Object.keys(usersData)[0]; // Pega o UID do primeiro resultado
+            const playerProfile = usersData[playerUid]; // Pega o perfil do jogador
 
+            // 4. Exibe os detalhes do jogador no modal
+            // Esta função já existe no seu código e será chamada aqui
+            showPlayerDetailsModal(playerUid, playerProfile);
+        } else {
+            // 5. Se nenhum usuário for encontrado
+            showNotification("Nenhum jogador encontrado com este ID.");
+        }
+    } catch (error) {
+        console.error("Erro ao buscar jogador:", error);
+        showNotification("Ocorreu um erro ao realizar a busca. Tente novamente.");
+    }
+}
+
+// NOVA FUNÇÃO PARA OUVIR SOLICITAÇÕES DE AMIZADE
+function listenForFriendRequests(uid) {
+    const requestsRef = firebase.database().ref(`friend_requests/${uid}/received`);
+    const badge = document.getElementById('friend-request-badge');
+
+    // O listener 'on' fica ativo e reage a qualquer mudança
+    requestsRef.on('value', (snapshot) => {
+        if (snapshot.exists()) {
+            // Se houver qualquer solicitação, mostra o badge
+            badge.classList.add('visible');
+        } else {
+            // Se não houver solicitações, esconde o badge
+            badge.classList.remove('visible');
+        }
+    });
+}
 
 // ===== FUNCIONALIDADES DE EVENTOS E PASSEIOS =====
 
