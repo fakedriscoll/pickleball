@@ -2622,9 +2622,14 @@ body {
 }
 
 @keyframes pulse-badge {
-    0% { transform: scale(0.8); opacity: 0.7; }
-    50% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(0.8); opacity: 0.7; }
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.notification-badge.visible {
+    display: block; /* Mostra o badge quando a classe 'visible' é adicionada */
+    animation: pulse-badge 1.5s infinite;
 }
 
 /* Estilo principal do botão */
@@ -2837,6 +2842,7 @@ body {
     color: #64748b;
     border-radius: 20px;
     transition: all 0.3s ease;
+    position: relative; /* Necessário para posicionar o badge corretamente */
 }
 
 .tab-link:hover {
@@ -3751,4 +3757,81 @@ body {
 /* Ajuste no botão de adicionar amigo */
 .add-friend-form button {
     white-space: nowrap; /* Impede que o texto quebre */
+}
+
+/* NOVO: Estilos para o Modal de Ações do Jogador */
+.player-actions-content {
+    max-width: 380px; /* Modal menor e mais focado */
+    padding: 25px;
+    text-align: center;
+}
+
+.player-actions-content h3 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin-bottom: 25px;
+    font-weight: 600;
+    word-wrap: break-word; /* Garante que nomes longos não quebrem o layout */
+}
+
+.player-actions-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.action-btn {
+    width: 100%;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.action-btn.profile {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.action-btn.whatsapp {
+    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+    color: white;
+}
+
+.action-btn::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 1.2rem;
+}
+
+.action-btn.profile::before {
+    content: '\f007'; /* Ícone de usuário */
+}
+
+.action-btn.whatsapp::before {
+    content: '\f232'; /* Ícone do WhatsApp */
+}
+
+/* Adicionar cursor de ponteiro aos nomes clicáveis */
+.player-name-clickable, .ranking-username, .players-list .player-name {
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.player-name-clickable:hover, .ranking-username:hover, .players-list .player-name:hover {
+    color: #667eea; /* Cor de destaque ao passar o mouse */
+    text-decoration: underline;
 }
